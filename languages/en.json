@@ -1,0 +1,14 @@
+{
+  "tokenActionHud": {
+    "abfalter": {
+      "abilities": "Secondary Abilities",
+      "fav-abilities": "Favorited Secondary Abilities",
+      "settings": {
+        "displayUnequipped": {
+          "hint": "Choose whether to display unequipped items on the HUD",
+          "name": "Display Unequipped"
+        }
+      }
+    }
+  }
+}

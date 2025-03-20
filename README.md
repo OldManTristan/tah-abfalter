@@ -1,2 +1,1 @@
-# tah-abfalter
-Token Action HUD for Anima Altered
+# fvtt-token-action-hud-abfalter

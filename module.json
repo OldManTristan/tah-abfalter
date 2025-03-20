@@ -1,0 +1,59 @@
+{
+  "id": "fvtt-token-action-hud-abfalter",
+  "title": "Token Action HUD for Anima Beyond Fantasy Altered",
+  "description": "",
+  "authors": [
+    {
+      "name": "a",
+      "url": "a"
+    }
+  ],
+  "version": "0.0.0",
+  "compatibility": {
+    "minimum": "12.331",
+    "verified": "12.331"
+  },
+  "esmodules": [
+    "./scripts/token-action-hud-abfalter.min.js"
+  ],
+  "styles": [
+    "./styles/tah-abfalter-style.css"
+  ],
+  "languages": [
+    {
+      "lang": "en",
+      "name": "English",
+      "path": "languages/en.json"
+    }
+  ],
+  "relationships": {
+    "systems": [
+      {
+        "id": "abfalter",
+        "type": "system",
+        "compatibility": [
+          {
+            "minimum": "1.4.6",
+            "verified": "1.4.6"
+          }
+        ]
+      }
+    ],
+    "requires": [
+      {
+        "id": "token-action-hud-core",
+        "type": "module",
+        "compatibility": [
+          {
+            "minimum": "2.0",
+            "verified": "2.0.11"
+          }
+        ]
+      }
+    ],
+    "optional": [],
+    "flags": {
+      "optional": []
+    }
+  }
+}
