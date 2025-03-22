@@ -1,7 +1,7 @@
 // System Module Imports
 import { ActionHandler } from './action-handler.js'
 import { RollHandler as Core } from './roll-handler.js'
-import { MODULE } from './constants.js'
+import { MODULE, LOG_PREFIX } from './constants.js'
 import { DEFAULTS } from './defaults.js'
 import * as systemSettings from './settings.js'
 
@@ -82,14 +82,16 @@ Hooks.once('tokenActionHudCoreApiReady', async (coreModule) => {
          * @returns {object} The TAH system styles
          */
         registerStyles () {
+            //console.log(`${LOG_PREFIX}style registering`);
+            
             //TODO
             //Might change things here
             return {
                 template: {
-                    class: 'tah-style-template-style', // The class to add to first DIV element
-                    file: 'tah-template-style', // The file without the css extension
+                    class: 'tah-abflater-template-style', // The class to add to first DIV element
+                    file: 'tah-abfalter-style', // The file without the css extension
                     moduleId: MODULE.ID, // The module ID
-                    name: 'Template Style' // The name to display in the Token Action HUD Core 'Style' module setting
+                    name: 'Abfalter Template Style' // The name to display in the Token Action HUD Core 'Style' module setting
                 }
             }
         }

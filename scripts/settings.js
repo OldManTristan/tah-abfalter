@@ -6,7 +6,7 @@ import { MODULE } from './constants.js'
  * @param {function} coreUpdate Token Action HUD Core update function
  */
 export function register (coreUpdate) {
-    game.settings.register(MODULE.ID, 'displayUnequipped', {
+    /*game.settings.register(MODULE.ID, 'displayUnequipped', {
         name: game.i18n.localize('tokenActionHud.template.settings.displayUnequipped.name'),
         hint: game.i18n.localize('tokenActionHud.template.settings.displayUnequipped.hint'
         ),
@@ -17,7 +17,7 @@ export function register (coreUpdate) {
         onChange: (value) => {
             coreUpdate(value)
         }
-    })
+    })*/
     //TODO
     //Probably add things here
 }

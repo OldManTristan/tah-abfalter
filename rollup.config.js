@@ -8,13 +8,14 @@ export default [
                 'scripts/*.js'
             ],
             exclude: [
-                'scripts/token-action-hud-abfalter.min.js'
+                'scripts/token-action-hud-abfalter.min.js',
+                'scripts/foundry.js'
             ]
         },
         output: {
             format: 'esm',
             file: 'scripts/token-action-hud-abfalter.min.js',
-            sourcemap: false
+            sourcemap: true
         },
         plugins: [
             terser({ keep_classnames: true, keep_fnames: true }),

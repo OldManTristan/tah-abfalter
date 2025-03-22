@@ -15,12 +15,112 @@ Hooks.once('tokenActionHudCoreApiReady', async (coreModule) => {
     DEFAULTS = {
         layout: [
             {
+                nestId: 'attack',
+                id: 'attack',
+                name: coreModule.api.Utils.i18n('abfalter.attack'),
+                groups: [
+                    { ...groups.attack, nestId: 'attack_attack' }
+                ]
+            },
+            {
+                nestId: 'strikes',
+                id: 'strikes',
+                name: 'strikes',//coreModule.api.Utils.i18n('PF2E.StrikesLabel'),
+                groups: [
+                    { ...groups.toggles, nestId: 'strikes_toggles' },
+                    { ...groups.strikes, nestId: 'strikes_strikes' }
+                ],
+                settings: { customWidth: 500 }
+            },
+            /*{
+                nestId: 'actions',
+                id: 'actions',
+                name: coreModule.api.Utils.i18n('PF2E.ActionsActionsHeader'),
+                groups: [
+                    { ...groups.actions, nestId: 'actions_actions' },
+                    { ...groups.reactions, nestId: 'actions_reactions' },
+                    { ...groups.freeActions, nestId: 'actions_free-actions' },
+                    { ...groups.passives, nestId: 'actions_passives' }
+                ]
+            },*/
+            {
+                nestId: 'inventory',
+                id: 'inventory',
+                name: coreModule.api.Utils.i18n('abfalter.inventory'),
+                groups: [
+                    { ...groups.weapons, nestId: 'inventory_weapons' },
+                    { ...groups.shields, nestId: 'inventory_shields' },
+                    { ...groups.armor, nestId: 'inventory_armor' },
+                    { ...groups.equipment, nestId: 'inventory_equipment' },
+                    { ...groups.consumables, nestId: 'inventory_consumables' },
+                    { ...groups.containers, nestId: 'inventory_containers' },
+                    { ...groups.treasure, nestId: 'inventory_treasure' }
+                ]
+            },
+            /*{
+                nestId: 'feats',
+                id: 'feats',
+                name: coreModule.api.Utils.i18n('PF2E.Item.Feat.Plural'),
+                groups: [
+                    { ...groups.ancestryFeatures, nestId: 'feats_ancestry-features' },
+                    { ...groups.classFeatures, nestId: 'feats_class-features' },
+                    { ...groups.ancestryFeats, nestId: 'feats_ancestry-feats' },
+                    { ...groups.classFeats, nestId: 'feats_class-feats' },
+                    { ...groups.skillFeats, nestId: 'feats_skill-feats' },
+                    { ...groups.generalFeats, nestId: 'feats_general-feats' },
+                    { ...groups.bonusFeats, nestId: 'feats_bonus-feats' }
+                ]
+            },*/
+            {
+                nestId: 'spells',
+                id: 'spells',
+                name: coreModule.api.Utils.i18n('PF2E.Item.Spell.Plural'),
+                groups: [
+                    { ...groups.spells, nestId: 'spells_spells' }
+                ]
+            },
+            {
+                nestId: 'attributes',
+                id: 'attributes',
+                name: coreModule.api.Utils.i18n('tokenActionHud.pf2e.attributes'),
+                groups: [
+                    { ...groups.heroPoints, nestId: 'attributes_hero-points' },
+                    { ...groups.mythicPoints, nestId: 'attributes_mythic-points' },
+                    { ...groups.initiative, nestId: 'attributes_initiative' },
+                    { ...groups.perceptionCheck, nestId: 'attributes_perception-check' },
+                    { ...groups.saves, nestId: 'attributes_saves' }
+                ]
+            },
+            {
                 nestId: 'abilities',
                 id: 'abilities',
-                name: coreModule.api.Utils.i18n('tokenActionHud.abfalter.abilities'),
+                name: coreModule.api.Utils.i18n('abfalter.ability'),
                 groups: [
-                    { ...groups.abilities, nestId: 'abilities_regular' },
-                    { ...groups['fav-abilities'], nestId: 'abilities_fav' }
+                    { ...groups.coreSkills, nestId: 'abilities_core-skills' },
+                    { ...groups.loreSkills, nestId: 'abilities_lore-skills' }
+                ]
+            },
+            {
+                nestId: 'effects',
+                id: 'effects',
+                name: coreModule.api.Utils.i18n('abfalter.effects'),
+                groups: [
+                    { ...groups.conditions, nestId: 'effects_conditions' },
+                    { ...groups.socialConditions, nestId: 'effects_social-conditions' },
+                    { ...groups.otherConditions, nestId: 'effects_other-conditions' },
+                    { ...groups.effects, nestId: 'effects_effects' }
+                ]
+            },
+            {
+                nestId: 'utility',
+                id: 'utility',
+                name: coreModule.api.Utils.i18n('tokenActionHud.utility'),
+                groups: [
+                    { ...groups.combat, nestId: 'utility_combat' },
+                    { ...groups.token, nestId: 'utility_token' },
+                    { ...groups.recoveryCheck, nestId: 'utility_recovery-check' },
+                    { ...groups.rests, nestId: 'utility_rests' },
+                    { ...groups.utility, nestId: 'utility_utility' }
                 ]
             }
         ],
