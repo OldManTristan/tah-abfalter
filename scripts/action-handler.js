@@ -1,5 +1,5 @@
 // System Module Imports
-import { ACTION_ICON, ACTION_TYPE, CARRY_TYPE_ICON, ITEM_TYPE, MODULAR_OPTION, SKILL_ABBREVIATION, SKILL, SKILL_ACTION, STRIKE_ICON, STRIKE_USAGE, DAMAGE_TYPE_ICONS } from './constants.js'
+import { ACTION_ICON, ACTION_TYPE, CARRY_TYPE_ICON, ITEM_TYPE, MODULAR_OPTION, SKILL_ABBREVIATION, SKILL, SKILL_ACTION, STRIKE_ICON, STRIKE_USAGE, DAMAGE_TYPE_ICONS, LOG_PREFIX } from './constants.js'
 import { Utils } from './utils.js'
 
 export let ActionHandler = null
@@ -85,28 +85,27 @@ Hooks.once('tokenActionHudCoreApiReady', async (coreModule) => {
          */
         async #buildCharacterActions () {
             await Promise.all([
-                this.#buildActions(),
-                this.#buildCombat(),
+                //this.#buildActions(),
+                //this.#buildCombat(),
                 //this.#buildConditions(),
-                this.#buildEffects(),
-                this.#buildFeats(),
-                this.#buildHeroActions(),
+                //this.#buildEffects(),
+                //this.#buildFeats(),
+                //this.#buildHeroActions(),
                 //this.#buildPoints('heroPoints'),
                 //this.#buildPoints('mythicPoints'),
                 this.#buildInitiative(),
-                this.#buildInventory(),
-                this.#buildPerceptionCheck(),
-                this.#buildRecoveryCheck(),
-                this.#buildRests(),
-                this.#buildSaves(),
-                this.#buildSkillActions(),
-                this.#buildSkills(),
-                this.#buildSpells(),
-                this.#buildStrikes(),
-                this.#buildToggles()
+                //this.#buildInventory(),
+                //this.#buildPerceptionCheck(),
+                //this.#buildRecoveryCheck(),
+                //this.#buildRests(),
+                //this.#buildSaves(),
+                this.#buildAbilities(),
+                //this.#buildSpells(),
+                //this.#buildStrikes(),
+                //this.#buildToggles()
             ])
             // Build elemental blasts after other character actions so they are grouped together
-            await this.#buildElementalBlasts()
+            //await this.#buildElementalBlasts()
         }
 
         /**
@@ -123,7 +122,7 @@ Hooks.once('tokenActionHudCoreApiReady', async (coreModule) => {
                 this.#buildInventory(),
                 this.#buildPerceptionCheck(),
                 this.#buildSaves(),
-                this.#buildSkills()
+                this.#buildAbilities()
             ])
         }
 
@@ -155,8 +154,7 @@ Hooks.once('tokenActionHudCoreApiReady', async (coreModule) => {
                 this.#buildInventory(),
                 this.#buildPerceptionCheck(),
                 this.#buildSaves(),
-                this.#buildSkillActions(),
-                this.#buildSkills(),
+                this.#buildAbilities(),
                 this.#buildStrikes(),
                 this.#buildSpells(),
                 this.#buildToggles()
@@ -173,8 +171,7 @@ Hooks.once('tokenActionHudCoreApiReady', async (coreModule) => {
                 this.#buildInitiative(),
                 this.#buildPerceptionCheck(),
                 this.#buildSaves(),
-                this.#buildSkillActions(),
-                this.#buildSkills()
+                this.#buildAbilities()
             ])
         }
 
@@ -182,6 +179,8 @@ Hooks.once('tokenActionHudCoreApiReady', async (coreModule) => {
          * Build actions
          */
         async #buildActions () {
+            console.log(`${LOG_PREFIX}Build actions`);
+            
             const actionType = 'action'
 
             // Exit early if no items exist
@@ -266,6 +265,7 @@ Hooks.once('tokenActionHudCoreApiReady', async (coreModule) => {
          * @private
          */
         #buildAttack () {
+            console.log(`${LOG_PREFIX}Build attack`);
             const actionType = 'familiarAttack'
 
             const attack = this.actor.system.attack
@@ -300,6 +300,7 @@ Hooks.once('tokenActionHudCoreApiReady', async (coreModule) => {
          * Build combat
          */
         #buildCombat () {
+            console.log(`${LOG_PREFIX}Build combat`);
             const actionType = 'utility'
 
             // Set combat types
@@ -337,6 +338,7 @@ Hooks.once('tokenActionHudCoreApiReady', async (coreModule) => {
          * @private
          */
         async #buildConditions () {
+            console.log(`${LOG_PREFIX}Build conditions`);
             const actionType = 'condition'
             const limitedConditions = ['doomed', 'dying', 'wounded']
 
@@ -457,6 +459,7 @@ Hooks.once('tokenActionHudCoreApiReady', async (coreModule) => {
          * Build hero points
          */
         async #buildPoints (actionType) {
+            console.log(`${LOG_PREFIX}Build points`);
             let actions, groupData
 
             const mythicEnabled = this.actor.system.resources?.mythicPoints.max ? true : false
@@ -504,6 +507,7 @@ Hooks.once('tokenActionHudCoreApiReady', async (coreModule) => {
          * @private
          */
         async #buildEffects () {
+            console.log(`${LOG_PREFIX}Build effects`);
             const actionType = 'effect'
 
             // Get effects
@@ -556,6 +560,7 @@ Hooks.once('tokenActionHudCoreApiReady', async (coreModule) => {
          * @private
          */
         async #buildFeats () {
+            console.log(`${LOG_PREFIX}Build feats`);
             const actionType = 'feat'
             const featTypes = {
                 ancestryfeature: 'ancestry-features',
@@ -624,6 +629,7 @@ Hooks.once('tokenActionHudCoreApiReady', async (coreModule) => {
         * @private
         */
         async #buildHeroActions () {
+            console.log(`${LOG_PREFIX}Build hero actions`);
             if (!game.modules.get('pf2e-hero-actions')?.active) return
 
             const actionType = 'heroAction'
@@ -681,12 +687,45 @@ Hooks.once('tokenActionHudCoreApiReady', async (coreModule) => {
          * @private
          */
         async #buildInitiative () {
+            console.log(`${LOG_PREFIX}Build initiative`);
             const actionType = 'initiative'
 
-            const initiativeStatistic = this.actor?.system?.initiative?.statistic ?? null
+            const initiativeStatistic = this.actor?.system?.initiative ?? null
 
             // Get actions
             const actions = []
+            
+            if(this.actor.type === 'character'){
+                const initiative = coreModule.api.Utils.i18n('abfalter.initiative')
+                const fullName = coreModule.api.Utils.i18n('abfalter.initiative')
+                const name = coreModule.api.Utils.i18n('abfalter.initiative')
+                const actionTypeName = `${coreModule.api.Utils.i18n(ACTION_TYPE[actionType])}: ` ?? ''
+                const listName = `${actionTypeName}${name}`
+                const encodedValue = [actionType, 'perception'].join(this.delimiter)
+                //const active = (initiativeStatistic === 'perception') ? ' active' : ''
+                const cssClass = 'toggle'//`toggle${active}`
+                const modifier = this.actor.system.initiative.spec
+                const info1 = this.actor ? { text: modifier } : ''
+                const tooltipName = `${fullName}${(this.actor && modifier) ? ` ${modifier}` : ''}`
+                const tooltipData = {
+                    name: tooltipName,
+                    modifiers: initiative?.modifiers
+                }
+                const tooltip = this.actor ? await this.#getTooltip(actionType, tooltipData) : null
+
+                // Get actions
+                actions.push({
+                    id: 'initiative-value',
+                    name,
+                    listName,
+                    encodedValue,
+                    cssClass,
+                    info1,
+                    tooltip
+                })
+            }
+            
+            /*
 
             if (this.actorType !== 'hazard') {
                 const initiative = this.actor ? this.actor.system.initiative : coreModule.api.Utils.i18n('PF2E.PerceptionLabel')
@@ -771,7 +810,7 @@ Hooks.once('tokenActionHudCoreApiReady', async (coreModule) => {
                 })
             )
 
-            actions.push(...skillActions)
+            actions.push(...skillActions)*/
 
             // Create group data
             const groupData = { id: 'initiative', type: 'system' }
@@ -785,6 +824,7 @@ Hooks.once('tokenActionHudCoreApiReady', async (coreModule) => {
          * @private
          */
         async #buildInventory () {
+            console.log(`${LOG_PREFIX}Build inventory`);
             // Exit if no items exist
             if (this.items.size === 0) return
 
@@ -928,6 +968,7 @@ Hooks.once('tokenActionHudCoreApiReady', async (coreModule) => {
          * @private
          */
         async #buildPerceptionCheck () {
+            console.log(`${LOG_PREFIX}Build perception check`);
             const actionType = 'perceptionCheck'
             const perception = this.actor ? this.actor.system.perception : coreModule.api.Utils.i18n('PF2E.PerceptionLabel')
             const name = coreModule.api.Utils.i18n('PF2E.PerceptionLabel')
@@ -960,6 +1001,7 @@ Hooks.once('tokenActionHudCoreApiReady', async (coreModule) => {
          * Build recovery check
          */
         #buildRecoveryCheck () {
+            console.log(`${LOG_PREFIX}Build recovery check`);
             const actionType = 'recoveryCheck'
             const dyingValue = this.actor?.system.attributes?.dying
 
@@ -983,6 +1025,7 @@ Hooks.once('tokenActionHudCoreApiReady', async (coreModule) => {
          * Build rests
          */
         #buildRests () {
+            console.log(`${LOG_PREFIX}Build rests`);
             // Exit if multiple actors and not every actor is the character type
             if (!this.actor && !this.actors.every(actor => actor.type === 'character')) return
 
@@ -1023,6 +1066,7 @@ Hooks.once('tokenActionHudCoreApiReady', async (coreModule) => {
          * @private
          */
         async #buildSaves () {
+            console.log(`${LOG_PREFIX}Build saves`);
             const actionType = 'save'
 
             // Get saves
@@ -1066,90 +1110,16 @@ Hooks.once('tokenActionHudCoreApiReady', async (coreModule) => {
         }
 
         /**
-         * Build skill actions
+         * Build abilities
          * @private
          */
-        async #buildSkillActions () {
-            const actionType = 'compendiumMacro'
-
-            // Get skill actions
-            const actionMacros = await game.packs.get('pf2e.action-macros').getIndex()
-
-            if (!actionMacros.size) return
-
-            const skillActionsMap = new Map()
-
-            // Get actions
-            const actions = []
-            for (const actionMacro of actionMacros) {
-                const skillAction = SKILL_ACTION[actionMacro._id]
-
-                if (!skillAction) continue
-
-                const id = actionMacro._id
-                const actionName = coreModule.api.Utils.i18n(skillAction.name)
-                const skillName = coreModule.api.Utils.i18n(SKILL[skillAction.skill]?.name)
-                const name = `${actionName} - ${skillName}`
-                const actionTypeName = `${coreModule.api.Utils.i18n(ACTION_TYPE.skillAction)}: ` ?? ''
-                const listName = `${actionTypeName}${name}`
-                const encodedValue = [actionType, 'pf2e.action-macros', id].join(this.delimiter)
-                const icon1 = this.#getActionIcon(skillAction.actionCost)
-                const img = skillAction.image
-                const modifier = coreModule.api.Utils.getModifier(this.actor?.skills[skillAction.skill]?.check?.mod)
-                const info1 = this.actor ? { text: modifier } : null
-
-                const action = {
-                    id,
-                    name,
-                    listName,
-                    encodedValue,
-                    icon1,
-                    img,
-                    info1
-                }
-
-                actions.push(action)
-
-                skillActionsMap.set(skillAction.skill, skillActionsMap.get(skillAction.skill) || new Map())
-                skillActionsMap.get(skillAction.skill).set(actionMacro._id, { ...action, name: actionName })
-            }
-
-            // Add actions to HUD
-            await this.addActions(actions, { id: 'skill-actions-ungrouped', type: 'system' })
-
-            for (const [key, value] of Object.entries(SKILL)) {
-                const groupId = key
-                const groupName = coreModule.api.Utils.i18n(value.name)
-                const skillActions = skillActionsMap.get(groupId)
-
-                if (!skillActions) continue
-
-                // Create group data
-                const groupData = { id: groupId, name: groupName, type: 'system-derived' }
-
-                // Add group to HUD
-                await this.addGroup(groupData, { id: 'skill-actions-grouped', type: 'system' })
-
-                // Get actions
-                const actions = [...skillActions].map(([_, skillAction]) => {
-                    return skillAction
-                })
-
-                // Add actions to HUD
-                await this.addActions(actions, groupData)
-            }
-        }
-
-        /**
-         * Build skills
-         * @private
-         */
-        async #buildSkills () {
-            const actionType = 'skill'
+        async #buildAbilities () {
+            console.log(`${LOG_PREFIX}Build ability`);
+            const actionType = 'ability'
 
             // Get skills
             const skills = (this.actor)
-                ? Object.entries(this.actor.skills).filter(skill => !!skill[1].label && skill[1].label.length > 1)
+                ? this.#getAbilities()
                 : this.#getSharedSkills()
 
             if (!skills) return
@@ -1157,7 +1127,7 @@ Hooks.once('tokenActionHudCoreApiReady', async (coreModule) => {
             const coreSkills = []
             const loreSkills = []
 
-            for (const skill of skills) {
+            /*for (const skill of skills) {
                 if (!skill[1].lore) {
                     coreSkills.push(skill)
                 } else {
@@ -1167,11 +1137,17 @@ Hooks.once('tokenActionHudCoreApiReady', async (coreModule) => {
 
             coreSkills.sort((a, b) => a[1].label.localeCompare(b[1].label))
             loreSkills.sort((a, b) => a[1].label.localeCompare(b[1].label))
-
+            */
+            
             const skillsMap = new Map()
 
             skillsMap.set('skills', new Map())
 
+            skills.forEach(element => {
+                skillsMap.get('skills').set(element.label, element)
+            });
+
+            /*
             if (coreSkills.length > 0) {
                 skillsMap.set('core-skills', new Map())
             }
@@ -1185,7 +1161,7 @@ Hooks.once('tokenActionHudCoreApiReady', async (coreModule) => {
                 } else {
                     skillsMap.get('lore-skills').set(skill[0], skill[1])
                 }
-            }
+            }*/
 
             // Loop through inventory subcateogry ids
             for (const [key, value] of skillsMap) {
@@ -1199,14 +1175,14 @@ Hooks.once('tokenActionHudCoreApiReady', async (coreModule) => {
                 const actions = await Promise.all(
                     [...skills].map(async ([skillId, skillData]) => {
                         const id = skillId
-                        const label = coreModule.api.Utils.i18n(skillData.label) ?? coreModule.api.Utils.i18n(CONFIG.PF2E.skillList[skillId])
-                        const name = this.abbreviatedSkills ? SKILL_ABBREVIATION[skillData.slug] ?? label : label
+                        const label = coreModule.api.Utils.i18n(skillData.label) ?? coreModule.api.Utils.i18n(CONFIG.abfalter.skillId)
+                        const name = label
                         const fullName = label
                         const actionTypeName = `${coreModule.api.Utils.i18n(ACTION_TYPE[actionType])}: ` ?? ''
                         const listName = `${actionTypeName}${name}`
                         const encodedValue = [actionType, id].join(this.delimiter)
-                        const cssClass = (this.actor && this.colorSkills && skillData.rank > 0) ? `tah-pf2e-skill-rank-${skillData.rank}` : ''
-                        const modifier = coreModule.api.Utils.getModifier(skillData.check?.mod)
+                        const cssClass = ''//(this.actor && this.colorSkills && skillData.rank > 0) ? `tah-pf2e-skill-rank-${skillData.rank}` : ''
+                        const modifier = skillData.spec//coreModule.api.Utils.getModifier(skillData.check?.mod)
                         const info1 = this.actor ? { text: modifier } : ''
                         const tooltipName = `${fullName}${(this.actor && modifier) ? ` ${modifier}` : ''}`
                         const tooltipData = {
@@ -1231,6 +1207,18 @@ Hooks.once('tokenActionHudCoreApiReady', async (coreModule) => {
                 // Add actions to action list
                 this.addActions(actions, groupData)
             }
+            console.log(`${LOG_PREFIX}Build ability done`);
+        }
+
+        /**
+         * Get and unwraps all the abilities from actor.system.secondaryFields
+         * @returns 
+         */
+        #getAbilities(){
+            let filter1 = Object.entries(this.actor.system.secondaryFields).filter(s => s[0] !=='category')
+            let ret = []
+            filter1.forEach(s => Object.entries(s[1]).forEach(a => ret.push(a[1])))
+            return ret
         }
 
         /**
@@ -1250,6 +1238,7 @@ Hooks.once('tokenActionHudCoreApiReady', async (coreModule) => {
          * @private
          */
         async #buildSpells () {
+            console.log(`${LOG_PREFIX}Build spells`);
             const actionType = 'spell'
 
             // Create parent group data
@@ -1400,6 +1389,7 @@ Hooks.once('tokenActionHudCoreApiReady', async (coreModule) => {
          * Build elemental blasts
          */
         async #buildElementalBlasts () {
+            console.log(`${LOG_PREFIX}Build elemental blast`);
             const actionType = 'elementalBlast'
 
             // Get elemental blasts
@@ -1570,7 +1560,7 @@ Hooks.once('tokenActionHudCoreApiReady', async (coreModule) => {
 
             // Create parent group data
             const parentGroupData = { id: 'strikes', type: 'system' }
-
+            return
             // Get strikes
             const strikes = this.actor.system.actions
                 .filter(action => (action.type === actionType && (action.item.system.quantity > 0 || this.actor.type === 'hazard' || this.actor.type === 'npc')))
@@ -1804,10 +1794,11 @@ Hooks.once('tokenActionHudCoreApiReady', async (coreModule) => {
          * Build toggles
          */
         #buildToggles () {
+            console.log(`${LOG_PREFIX}Build toggles`);
             const actionType = 'toggle'
 
             // Get toggles
-            const toggles = Object.values(this.actor.synthetics.toggles).flatMap(domain => Object.values(domain))
+            const toggles = Object.values(this.actor.system.toggles).flatMap(domain => Object.values(domain))
 
             // Exit if no toggles exist
             if (!toggles.length) return

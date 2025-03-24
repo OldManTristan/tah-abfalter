@@ -1,8 +1,30 @@
 {
   "tokenActionHud": {
     "abfalter": {
-      "abilities": "Secondary Abilities",
-      "fav-abilities": "Favorited Secondary Abilities",
+      "categories":{
+        "fav": "Favorited",
+        "favShort": "Fav.",
+        "ath": "Athletics",
+        "athShort": "Athl.",
+        "crea": "Creative",
+        "creaShort": "Crea.",
+        "int": "Intelligence",
+        "intShort": "Int.",
+        "sub": "Subterfuge",
+        "subShort": "Subt.",
+        "soc": "Social",
+        "socShort": "Soc.",
+        "vig": "Vigor",
+        "vigShort": "Vig.",
+        "per": "Perception",
+        "perShort": "Per.",
+        "cust": "Custom",
+        "custShort": "Cust."
+      },
+      "groups":{
+        "combat": "Combat",
+        "ability": "Abilities"
+      },
       "settings": {
         "displayUnequipped": {
           "hint": "Choose whether to display unequipped items on the HUD",

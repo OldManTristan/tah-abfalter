@@ -14,6 +14,15 @@ Hooks.once('tokenActionHudCoreApiReady', async (coreModule) => {
     const groupsArray = Object.values(groups)
     DEFAULTS = {
         layout: [
+            /*{
+                nestId: 'initiative',
+                id: 'initiative',
+                name: coreModule.api.Utils.i18n('abfalter.initiative'),
+                groups:[
+                    {...groups.initiative, nestId: 'initiative_initiative'},
+                    {...groups.DEV, nestId: 'initiative_dev'}
+                ]
+            },
             {
                 nestId: 'attack',
                 id: 'attack',
@@ -32,17 +41,6 @@ Hooks.once('tokenActionHudCoreApiReady', async (coreModule) => {
                 ],
                 settings: { customWidth: 500 }
             },
-            /*{
-                nestId: 'actions',
-                id: 'actions',
-                name: coreModule.api.Utils.i18n('PF2E.ActionsActionsHeader'),
-                groups: [
-                    { ...groups.actions, nestId: 'actions_actions' },
-                    { ...groups.reactions, nestId: 'actions_reactions' },
-                    { ...groups.freeActions, nestId: 'actions_free-actions' },
-                    { ...groups.passives, nestId: 'actions_passives' }
-                ]
-            },*/
             {
                 nestId: 'inventory',
                 id: 'inventory',
@@ -52,25 +50,11 @@ Hooks.once('tokenActionHudCoreApiReady', async (coreModule) => {
                     { ...groups.shields, nestId: 'inventory_shields' },
                     { ...groups.armor, nestId: 'inventory_armor' },
                     { ...groups.equipment, nestId: 'inventory_equipment' },
-                    { ...groups.consumables, nestId: 'inventory_consumables' },
-                    { ...groups.containers, nestId: 'inventory_containers' },
-                    { ...groups.treasure, nestId: 'inventory_treasure' }
+                    //{ ...groups.consumables, nestId: 'inventory_consumables' },
+                    //{ ...groups.containers, nestId: 'inventory_containers' },
+                    //{ ...groups.treasure, nestId: 'inventory_treasure' }
                 ]
             },
-            /*{
-                nestId: 'feats',
-                id: 'feats',
-                name: coreModule.api.Utils.i18n('PF2E.Item.Feat.Plural'),
-                groups: [
-                    { ...groups.ancestryFeatures, nestId: 'feats_ancestry-features' },
-                    { ...groups.classFeatures, nestId: 'feats_class-features' },
-                    { ...groups.ancestryFeats, nestId: 'feats_ancestry-feats' },
-                    { ...groups.classFeats, nestId: 'feats_class-feats' },
-                    { ...groups.skillFeats, nestId: 'feats_skill-feats' },
-                    { ...groups.generalFeats, nestId: 'feats_general-feats' },
-                    { ...groups.bonusFeats, nestId: 'feats_bonus-feats' }
-                ]
-            },*/
             {
                 nestId: 'spells',
                 id: 'spells',
@@ -94,10 +78,16 @@ Hooks.once('tokenActionHudCoreApiReady', async (coreModule) => {
             {
                 nestId: 'abilities',
                 id: 'abilities',
-                name: coreModule.api.Utils.i18n('abfalter.ability'),
+                name: coreModule.api.Utils.i18n('tokenActionHud.abfalter.ability.full'),
                 groups: [
-                    { ...groups.coreSkills, nestId: 'abilities_core-skills' },
-                    { ...groups.loreSkills, nestId: 'abilities_lore-skills' }
+                    { ...groups.favAbilities, nestId: 'abilities_fav' },
+                    { ...groups.athAbilities, nestId: 'abilities_ath' },
+                    { ...groups.creaAbilities, nestId: 'abilities_crea' },
+                    { ...groups.intAbilities, nestId: 'abilities_int' },
+                    { ...groups.subAbilities, nestId: 'abilities_sub' },
+                    { ...groups.socAbilities, nestId: 'abilities_soc' },
+                    { ...groups.vigAbilities, nestId: 'abilities_vig' },
+                    { ...groups.custAbilities, nestId: 'abilities_cust' },
                 ]
             },
             {
@@ -110,17 +100,17 @@ Hooks.once('tokenActionHudCoreApiReady', async (coreModule) => {
                     { ...groups.otherConditions, nestId: 'effects_other-conditions' },
                     { ...groups.effects, nestId: 'effects_effects' }
                 ]
-            },
+            },*/
             {
                 nestId: 'utility',
                 id: 'utility',
                 name: coreModule.api.Utils.i18n('tokenActionHud.utility'),
                 groups: [
-                    { ...groups.combat, nestId: 'utility_combat' },
-                    { ...groups.token, nestId: 'utility_token' },
-                    { ...groups.recoveryCheck, nestId: 'utility_recovery-check' },
-                    { ...groups.rests, nestId: 'utility_rests' },
-                    { ...groups.utility, nestId: 'utility_utility' }
+                    //{ ...groups.combat, nestId: 'utility_combat' },
+                    { ...groups.token, nestId: 'utility_token' }//,
+                    //{ ...groups.recoveryCheck, nestId: 'utility_recovery-check' },
+                    //{ ...groups.rests, nestId: 'utility_rests' },
+                    //{ ...groups.utility, nestId: 'utility_utility' }
                 ]
             }
         ],

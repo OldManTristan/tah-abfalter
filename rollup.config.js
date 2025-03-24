@@ -8,13 +8,13 @@ export default [
                 'scripts/*.js'
             ],
             exclude: [
-                'scripts/token-action-hud-abfalter.min.js',
+                'scripts/tah-abfalter.min.js',
                 'scripts/foundry.js'
             ]
         },
         output: {
             format: 'esm',
-            file: 'scripts/token-action-hud-abfalter.min.js',
+            file: 'scripts/tah-abfalter.min.js',
             sourcemap: true
         },
         plugins: [
