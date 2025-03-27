@@ -14,10 +14,7 @@
     "verified": "12.331"
   },
   "esmodules": [
-    "./scripts/tah-abfalter.min.js"
-  ],
-  "styles": [
-    "./styles/tah-abfalter-style.css"
+    "./scripts/main.js"
   ],
   "languages": [
     {

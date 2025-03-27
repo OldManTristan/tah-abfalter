@@ -2,6 +2,95 @@ export let AnimaActionHandler = null
 export let AnimaRollHandler = null
 export let AnimaSystemManager = null
 export let DEFAULTS = null
+export const ACTION_TYPE = [
+    'characteristicRoll',
+    'secondaryRoll',
+    'potentialRoll',
+    'summoningRoll',
+    'combatRoll',
+    'weaponCombatRoll',
+    'resRoll',
+    'breakageRoll'
+]
+export const ACTION_TYPE_ID = [
+    'ability',
+    'rollinit',
+    'equip',
+    'res',
+]
+export class EncodedValue {
+
+    actionTypeId
+    actionType
+    name
+    roll
+    id
+
+    constructor(actionTypeId, actionType, name, roll, id){
+        this.actionTypeId = actionTypeId
+        this.actionType = actionType
+        this.name = name
+        this.roll = roll
+        this.id = id
+    }
+
+    /**
+     * Turns fields into a string separated by delimiter
+     * @param {string} delimiter 
+     * @returns {string}
+     */
+    wrap(delimiter){
+        return Object.values(this).join(delimiter)
+    }
+
+    /**
+     * returns new EncodedValue from string
+     * @param {string} encoded 
+     * @param {string} delimiter 
+     * @returns {EncodedValue}
+     */
+    static unwrap(encoded, delimiter){
+        let _ = encoded.split(delimiter)
+        return new EncodedValue(_[0], _[1], _[2], _[3], _[4])
+    }
+}
+export const GROUPS = {
+    combat: { id: 'combat', name: 'tokenActionHud.abfalter.groups.combat', type: 'system' },
+
+    initiative: { id: 'initiative', nestId: 'combat_initiative', name: 'abfalter.initiative', type: 'system' },
+    equipWeapon: { id: 'equipweapon', nestId: 'combat_equipweapon', name: 'tokenActionHud.abfalter.equipw', type: 'system' },
+
+    //rollinit: { id: 'rollinit', nestId: 'combat_initiative_rollinit', /*name: 'tokenActionHud.abfalter.rinit',*/ type: 'system', level: 1},
+    weapons: { id: 'weapons', nestId: 'combat_initiative_weapons', name: 'abfalter.weapons', type: 'system'},
+//  __________________________________________________
+    abilities: { id: 'ability', name: 'tokenActionHud.abfalter.groups.ability', type: 'system' },
+    
+    favAbility: { id: 'favability', nestId: 'ability_favability', name: 'tokenActionHud.abfalter.abillityGroup.fav', type: 'system' },
+    athAbility: { id: 'athability', nestId: 'ability_athability', name: 'tokenActionHud.abfalter.abillityGroup.ath', type: 'system' },
+    subAbility: { id: 'subability', nestId: 'ability_subability', name: 'tokenActionHud.abfalter.abillityGroup.sub', type: 'system' },
+    socAbility: { id: 'socability', nestId: 'ability_socability', name: 'tokenActionHud.abfalter.abillityGroup.soc', type: 'system' },
+    intAbility: { id: 'intability', nestId: 'ability_intability', name: 'tokenActionHud.abfalter.abillityGroup.int', type: 'system' },
+    creaAbility: { id: 'creaability', nestId: 'ability_creaability', name: 'tokenActionHud.abfalter.abillityGroup.crea', type: 'system' },
+    vigAbility: { id: 'vigability', nestId: 'ability_vigability', name: 'tokenActionHud.abfalter.abillityGroup.vig', type: 'system' },
+    perAbility: { id: 'perability', nestId: 'ability_perability', name: 'tokenActionHud.abfalter.abillityGroup.per', type: 'system' },
+    custAbility: { id: 'custability', nestId: 'ability_custability', name: 'tokenActionHud.abfalter.abillityGroup.cust', type: 'system' },
+//  __________________________________________________
+    resistances: { id:'res', name: 'abfalter.resistances', type: 'system'},
+
+    resistanceGroup: { id:'resgroup', nestId: 'res_resgroup', name: 'abfalter.resistances', type: 'system'},
+//  __________________________________________________
+    ki: { id: 'ki', name: 'abfalter.ki', type: 'system' },
+//  __________________________________________________
+    magic: { id: 'magic', name: 'abfalter.magic', type: 'system' },
+//  __________________________________________________
+    psy: { id: 'psy', name: 'abfalter.psychic', type: 'system' },
+//  __________________________________________________
+    inventory: { id: 'inventory', name: 'abfalter.inventory', type: 'system' },
+//  __________________________________________________
+    effects: { id: 'effects', name: 'abfalter.effects', type: 'system' },
+//  __________________________________________________
+    utility: { id: 'utility', name: 'tokenActionHud.utility', type: 'system' },
+}
 
 Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
 
@@ -10,6 +99,7 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
      */
     AnimaActionHandler = class AnimaActionHandler extends coreModule.api.ActionHandler{
 
+        multiple 
 
         /**
          * Build system actions
@@ -20,20 +110,80 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
         buildSystemActions(groupIds){
             this.#BuildCombat()
             this.#BuildAbilities()
-            this.#BuildKi()
+            this.#BuildRes()
+            /*this.#BuildKi()
             this.#BuildMagic()
             this.#BuildPsy()
             this.#BuildInventory()
-            this.#BuildEffect()
+            this.#BuildEffect()*/
         }
 
         #BuildCombat(){
+            if(this.actors.length > 1)
+                return;
 
+            let weapons = this.actor.items.filter(i => i.type === 'weapon')
+
+            //#region equip weapons
+            let equipWeapons = {
+                unnarmed: []
+            }
+
+            // add equip groups
+            /*weapons.forEach(w => {
+                let group = {
+                    id: `weapons${w.name}`,
+                    name: w.name,
+                    type: 'system-derived',
+                    listName: `Equip: ${w.name}`,
+                    nestId: `combat_equipweapon_${w.name}`
+                }
+
+                this.addGroup(group, GROUPS.equipWeapon)
+                
+                this.addActions([{
+                    name : `${game.i18n.localize('tokenActionHud.abfalter.equipw')}: ${w.name}`,
+                    id: `equip_${w.name}`,
+                    encodedValue: new EncodedValue(
+                        ACTION_TYPE_ID[2],
+                        '',
+                        w.name,
+                        '',
+                        w._id
+                    ).wrap(this.delimiter)
+                }], group)
+            })*/
+
+            //this.addGroup(GROUPS.rollinit, GROUPS.initiative)
+
+            this.addActions([{
+                name: game.i18n.localize('tokenActionHud.abfalter.rinit'),
+                id: 'roll_init',
+                encodedValue: new EncodedValue(
+                    ACTION_TYPE_ID[1],
+                    '',
+                    game.i18n.localize('tokenActionHud.abfalter.rinit'),
+                    this.actor.system.initiative.final,
+                    ''
+                ).wrap(this.delimiter)
+            }], GROUPS.initiative)
+            //#endregion
+
+            //addgroup combat
+
+            //foreach weapon
+            //->foreach attack
+            //-> add group attack
+            //->add group defense
+
+            //this.addGroup(initG, combatG)
+            //this.addGroup(combat2G, combatG)
         }
 
         #BuildAbilities(){
+            this.multiple = this.actors.length > 1
             let abilitiesList = []
-            Object.entries(this.actor.system.secondaryFields).filter(s => s[0] !=='category').forEach(s => Object.entries(s[1]).forEach(a => abilitiesList.push(a[1])))
+            Object.entries(this.actors[0].system.secondaryFields).filter(s => s[0] !=='category').forEach(s => Object.entries(s[1]).forEach(a => abilitiesList.push(a[1])))
             //might have to separate abilities from item secondary, depending on how the rollHandler fares
             let abilities = {
                 fav: [],
@@ -46,10 +196,10 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
                 per: [],
                 cust: []
             }
-            let strPath = 'tokenActionHud.abfalter.categories.'
+            let strPath = 'tokenActionHud.abfalter.abillityGroup.'
 
             //add custom abilities
-            this.actor.items.filter(i => i.type === 'secondary').forEach(i => {
+            this.actors[0].items.filter(i => i.type === 'secondary').forEach(i => {
                 let data = {
                     /*armorPen: false,
                     base: i.system.base,
@@ -69,24 +219,28 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
                     temp: 0,*/
                     type: "custom"
                 }
-                abilities.cust.push(data)
                 abilitiesList.push(data)
             })
 
             //prepare actions
             abilitiesList.forEach(ab => {
+
+                //abilities needing to be unlocked
+                if(!multiple){ //multiple actor selected bypasses this restriction
+                    if(ab.label ==='kiDetection' && !this.actor.system.kiAbility.kiDetection.status)
+                        return
+    
+                    if(ab.label ==='kiConceal' && !this.actor.system.kiAbility.kiConceal.status)
+                        return
+                }
+
                 let name = ab.type === 'custom' ? ab.label : game.i18n.localize(`abfalter.${ab.label}`)
                 let custLabel = ab.type === 'custom' ? ab.label.replaceAll(' ', '').toLowerCase() : ab.label
 
                 let data = {
                     name: name,
                     id: `ability_${custLabel}`,
-                    encodedValue: [
-                        'ability',
-                        custLabel,
-                        ab.final,
-                        'secondaryRoll'
-                    ].join(this.delimiter)
+                    encodedValue: new EncodedValue (ACTION_TYPE_ID[0], ACTION_TYPE[1], custLabel, ab.final, '').wrap(this.delimiter)
                 }
 
                 switch(ab.label){
@@ -166,16 +320,23 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
                     case 'withstpain':
                         abilities.vig.push(data)
                         break;
+
+                    default:
+                        abilities.cust.push(data)
                 }
 
                 if(ab.fav)
                     abilities.fav.push(data)
             })
 
+            let parentGroup = GROUPS.abilities
             Object.values(abilities).forEach((_, i) => {
-                let aName = `${Object.keys(abilities)[i]}` //TODO add switch to short names is setting set
-                this.addGroup({id:`${Object.keys(abilities)[i]}abilities`, name:game.i18n.localize(`${strPath}${aName}`), type:'system'}, {id:'abilities', type: 'system'})
-                this.addActions(_, {id:`${Object.keys(abilities)[i]}abilities`, type:'system'})
+                let abID = `${Object.keys(abilities)[i]}${parentGroup.id}` //TODO add switch to short names is setting set
+                let currentGroup = Object.values(GROUPS).find(i => i.id === abID)
+
+                this.addGroup(currentGroup, parentGroup, true)
+
+                this.addActions(_, currentGroup)
             })
         }
 
@@ -215,6 +376,27 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
             }
         }
 
+        #BuildRes(){
+            let actorRes = this.actors[0].system.resistances
+
+            let res = [actorRes.Physical, actorRes.Disease, actorRes.Poison, actorRes.Magic, actorRes.Psychic]
+
+            this.addGroup(GROUPS.resistanceGroup, GROUPS.resistances)
+
+            res.forEach(r => {
+                this.addActions([{
+                    id: `${GROUPS.resistances.id}_${r.name}`,
+                    name: r.name,
+                    encodedValue: new EncodedValue (
+                        ACTION_TYPE_ID[3],
+                        ACTION_TYPE[6],
+                        r.name,
+                        r.final,
+                        '').wrap(this.delimiter)
+                }], GROUPS.resistanceGroup)
+            })
+        }
+
         #BuildKi(){
 
         }
@@ -245,38 +427,56 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
          * Called by Token Action HUD Core when an action event is triggered
          * @override
          * @param {object} event        The event
-         * @param {string} encodedValue The encoded value
+         * @param {string} encodedValue The encoded value, array elements delimited by a pipe.
          */
         async handleActionClick (event, encodedValue){
-
-            let split = encodedValue.split('|')
-
             let tokens = canvas.tokens.controlled.filter(t => t.actor?.type === 'character')
 
             tokens.forEach(async t => {
-                await this.#handleAction(event, t.actor, split[0], split[1], split[2], split[3])
+                await this.#handleAction(event, t.actor, t, encodedValue)
             })
         }
 
-        async #handleAction(event, actor, actionTypeId, label, rollValue, actionType){
-
+        async #handleAction(event, actor, token, encodedValue){
+            let value = EncodedValue.unwrap(encodedValue, '|')
             //I don't know enough about JS ¯\_(ツ)_/¯
             let juryriggedEvent = {
                 preventDefault() {},
                 defaultPrevented: true,
                 currentTarget : {
                     dataset: {
-                        label: label,
-                        roll: rollValue,
-                        type: actionType
+                        label: value.name,
+                        roll: value.roll,
+                        type: value.actionType
                     }
                 }
             }
             
-            switch(actionTypeId){
-                case 'ability':
+            switch(value.actionTypeId){
+
+                case ACTION_TYPE_ID[0]: //ability
+                case ACTION_TYPE_ID[3]: //res
                     actor.sheet._onRoll(juryriggedEvent)
-                    break
+                    break;
+
+                case ACTION_TYPE_ID[1]: //inititative
+                    let t
+                    //add to combat if it isn't yet
+                    if(!token.inCombat)
+                        t = await game.combat.createEmbeddedDocuments("Combatant", [{tokenId: token.id}])
+                    else
+                        t = game.combat.getCombatantsByToken(token)
+
+                    for (let i of Array.from(t))
+                        i.actor.rollInitiative()
+
+                    break;
+
+                case ACTION_TYPE_ID[2]: //equip
+                    let item = actor.items.get(value.id)
+                    item.system.equipped = !item.system.equipped;
+                    item.update({ "system.equipped": item.system.equipped });
+                    break;
             }
         }
     }
@@ -319,56 +519,49 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
             return new AnimaRollHandler()
         }
 
+        registerSettings (onChangeFunc){
+            //game.settings.register()
+        }
+
         /**
          * Returns the default layout and groups to Token Action HUD Core
          * Called by Token Action HUD Core
          * @returns {object} The default layout and groups
          */
         async registerDefaults () {
-            const GROUP = {
-                combat: { id: 'combat', name: 'tokenActionHud.abfalter.groups.combat', type: 'system' },
-                abilities: { id: 'abilities', name: 'tokenActionHud.abfalter.groups.ability', type: 'system' },
-                ki: { id: 'ki', name: 'abfalter.ki', type: 'system' },
-                magic: { id: 'magic', name: 'abfalter.magic', type: 'system' },
-                psy: { id: 'psy', name: 'abfalter.psychic', type: 'system' },
-                inventory: { id: 'inventory', name: 'abfalter.inventory', type: 'system' },
-                effects: { id: 'effects', name: 'abfalter.effects', type: 'system' },
-                utility: { id: 'utility', name: 'tokenActionHud.utility', type: 'system' },
-                
-                favAbilities: { id: 'favabilities', name: 'tokenActionHud.abfalter.groups.fav', type: 'system' },
-                athAbilities: { id: 'athabilities', name: 'tokenActionHud.abfalter.groups.ath', type: 'system' },
-                subAbilities: { id: 'subabilities', name: 'tokenActionHud.abfalter.groups.sub', type: 'system' },
-                socAbilities: { id: 'socabilities', name: 'tokenActionHud.abfalter.groups.soc', type: 'system' },
-                intAbilities: { id: 'intabilities', name: 'tokenActionHud.abfalter.groups.int', type: 'system' },
-                creaAbilities: { id: 'creaabilities', name: 'tokenActionHud.abfalter.groups.crea', type: 'system' },
-                vigAbilities: { id: 'vigabilities', name: 'tokenActionHud.abfalter.groups.vig', type: 'system' },
-                perAbilities: { id: 'perabilities', name: 'tokenActionHud.abfalter.groups.per', type: 'system' },
-                custAbilities: { id: 'custabilities', name: 'tokenActionHud.abfalter.groups.cust', type: 'system' },
-            }
-
-            const groups = GROUP
-            Object.values(groups).forEach(group => {
+            const groups = GROUPS
+            Object.values(GROUPS).forEach(group => {
                 group.name = coreModule.api.Utils.i18n(group.name)
                 group.listName = `Group: ${coreModule.api.Utils.i18n(group.listName ?? group.name)}`
             })
-            const groupsArray = Object.values(groups)
+            const groupsArray = Object.values(GROUPS)
             DEFAULTS = {
                 layout: [
                     {
-                        nestId: 'abilities',
-                        id: 'abilities',
-                        name: coreModule.api.Utils.i18n('tokenActionHud.abfalter.groups.ability'),
+                        ...groups.combat,
+                        nestId: groups.combat.id,
                         groups: [
-                            { ...groups.favAbilities, nestId: 'abilities_fav' },
-                            { ...groups.athAbilities, nestId: 'abilities_ath' },
-                            { ...groups.intAbilities, nestId: 'abilities_int' },
-                            { ...groups.perAbilities, nestId: 'abilities_per' },
-                            { ...groups.socAbilities, nestId: 'abilities_soc' },
-                            { ...groups.subAbilities, nestId: 'abilities_sub' },
-                            { ...groups.creaAbilities, nestId: 'abilities_crea' },
-                            { ...groups.vigAbilities, nestId: 'abilities_vig' },
-                            { ...groups.custAbilities, nestId: 'abilities_cust' },
+                            { ...groups.initiative },
+                            { ...groups.equipWeapon }
                         ]
+                    },
+                    {
+                        ...groups.abilities,
+                        nestId: groups.abilities.id,
+                        groups: [
+                            { ...groups.favAbility },
+                            { ...groups.athAbility },
+                            { ...groups.intAbility },
+                            { ...groups.perAbility },
+                            { ...groups.socAbility },
+                            { ...groups.subAbility },
+                            { ...groups.creaAbility },
+                            { ...groups.vigAbility },
+                        ]
+                    },
+                    {
+                        ...groups.resistances,
+                        nestId: groups.resistances.id
                     }
                 ],
                 groups: groupsArray
