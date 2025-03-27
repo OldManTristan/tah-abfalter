@@ -119,8 +119,25 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
         }
 
         #BuildCombat(){
-            if(this.actors.length > 1)
-                return;
+            let rollInitAction = [{
+                name: game.i18n.localize('tokenActionHud.abfalter.rinit'),
+                id: 'roll_init',
+                encodedValue: new EncodedValue(
+                    ACTION_TYPE_ID[1],
+                    '',
+                    game.i18n.localize('tokenActionHud.abfalter.rinit'),
+                    '', //no value since we don't need it in actionHandler
+                    ''
+                ).wrap(this.delimiter)
+            }]
+
+            this.multiple = this.actors.length > 1
+
+
+            if(this.multiple){
+                this.addActions(rollInitAction, GROUPS.initiative)
+                return
+            }
 
             let weapons = this.actor.items.filter(i => i.type === 'weapon')
 
@@ -156,17 +173,7 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
 
             //this.addGroup(GROUPS.rollinit, GROUPS.initiative)
 
-            this.addActions([{
-                name: game.i18n.localize('tokenActionHud.abfalter.rinit'),
-                id: 'roll_init',
-                encodedValue: new EncodedValue(
-                    ACTION_TYPE_ID[1],
-                    '',
-                    game.i18n.localize('tokenActionHud.abfalter.rinit'),
-                    this.actor.system.initiative.final,
-                    ''
-                ).wrap(this.delimiter)
-            }], GROUPS.initiative)
+            this.addActions(rollInitAction, GROUPS.initiative)
             //#endregion
 
             //addgroup combat
@@ -226,7 +233,7 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
             abilitiesList.forEach(ab => {
 
                 //abilities needing to be unlocked
-                if(!multiple){ //multiple actor selected bypasses this restriction
+                if(!this.multiple){ //multiple actor selected bypasses this restriction
                     if(ab.label ==='kiDetection' && !this.actor.system.kiAbility.kiDetection.status)
                         return
     
