@@ -2,6 +2,7 @@ export let AnimaActionHandler = null
 export let AnimaRollHandler = null
 export let AnimaSystemManager = null
 export let DEFAULTS = null
+/** The sheet one */
 export const ACTION_TYPE = [
     'characteristicRoll',
     'secondaryRoll',
@@ -12,11 +13,14 @@ export const ACTION_TYPE = [
     'resRoll',
     'breakageRoll'
 ]
+/** The custom one */
 export const ACTION_TYPE_ID = [
     'ability',
     'rollinit',
     'equip',
     'res',
+    'atk',
+    'combat',
 ]
 export class EncodedValue {
 
@@ -135,18 +139,19 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
         #BuildCombat(){
             let weapons = this.actor.items.filter(i => i.type === 'weapon')
 
-            //#region equip weapons
+            
             this.addGroup(GROUPS.equipWeapon, GROUPS.initiative)
 
             weapons.forEach(w => {
-                let group = {
+                //#region equip weapons
+                let groupInit = {
                     id: `equip${w.name}`,
                     name: w.name,
                     type: 'system-derived',
                     settings: {showTitle: false}
                 }
 
-                this.addGroup(group, GROUPS.equipWeapon)
+                this.addGroup(groupInit, GROUPS.equipWeapon)
 
                 let label = (w.system.equipped) ?
                     game.i18n.localize('tokenActionHud.abfalter.unequip') + w.name :
@@ -162,10 +167,44 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
                         '',
                         w._id
                     ).wrap(this.delimiter)
-                }], group)
-            })
+                }], groupInit)
             
-            //#endregion
+                //#endregion
+
+                //#region combat weapon
+                let groupCombat = {
+                    id: `combat${w.name}`,
+                    name: w.name,
+                    type: 'system-derived',
+                    settings: {/*showTitle: false*/}
+                }
+
+                //TODO
+                //setting show image
+
+                groupCombat.settings.image = w.img
+
+                this.addGroup(groupCombat, GROUPS.combatAction)
+
+                let wActions = this.#BuildWeaponActions(w)
+
+                this.addActions(wActions.actions, groupCombat)
+
+
+                
+                //TODO
+                // setting show break
+
+                this.addActions((wActions.break || []), groupCombat)
+                //#endregion
+            })
+
+            //add unarmed weapon, just in case
+            //TODO
+            //setting show basic
+            if(this.#isUnnarmed(weapons) /* || setting*/){
+                this.addActions(this.#BuildWeaponActions(null).actions, GROUPS.combatAction)
+            }
             
             //roll init
             this.addActions([{
@@ -179,16 +218,99 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
                     ''
                 ).wrap(this.delimiter)
             }], GROUPS.initiative)
+        }
 
-            //addgroup combat
+        /**
+         * Returns wether or not this actor is unarmed
+         * @param {any[]} weapons 
+         * @returns {boolean} true if unarmed, false otherwise
+         */
+        #isUnnarmed(weapons){
+            //return true //test only
+            let equipped
+            if(weapons.length < 1)
+                return true
 
-            //foreach weapon
-            //->foreach attack
-            //-> add group attack
-            //->add group defense
+            weapons.forEach(w => equipped = equipped || w.system.equipped)
 
-            //this.addGroup(initG, combatG)
-            //this.addGroup(combat2G, combatG)
+            return !equipped
+        }
+
+        /**
+         * Returns an object with 2 arrays:
+         * 
+         * -actions : atk, block & dodge
+         * 
+         * -break : break (separated because optionnal)
+         * @param {*} w set null for unarmed
+         * @returns 
+         */
+        #BuildWeaponActions(w){
+            let _return = {
+                actions: [],
+                break: []
+            }
+            let unarmed = game.i18n.localize('abfalter.unarmed')
+            let label = (!!w ? w.name : unarmed)
+            let id = !!w ? w._id : ''
+
+            let actionAtk = {
+                name : `${game.i18n.localize('abfalter.attack')}`,
+                id: `atk${label}`,
+                encodedValue: new EncodedValue(
+                    ACTION_TYPE_ID[(!!w ? 4 : 5)],
+                    ACTION_TYPE[(!!w ? 5 : 4)],
+                    label,
+                    (!!w ? '' : this.actor.system.combatValues.attack.final),
+                    id
+                ).wrap(this.delimiter)
+            }
+
+            let actionBlock = {
+                name : `${game.i18n.localize('abfalter.block')}`,
+                id: `block${label}`,
+                encodedValue: new EncodedValue(
+                    ACTION_TYPE_ID[5],
+                    ACTION_TYPE[(!!w ? 6 : 4)],
+                    label,
+                    (!!w ? '' : this.actor.system.combatValues.block.final),
+                    id
+                ).wrap(this.delimiter)
+            }
+
+            let actionDodge = {
+                name : `${game.i18n.localize('abfalter.dodge')}`,
+                id: `dodge${label}`,
+                encodedValue: new EncodedValue(
+                    ACTION_TYPE_ID[5],
+                    ACTION_TYPE[(!!w ? 6 : 4)],
+                    label,
+                    (!!w ? '' : this.actor.system.combatValues.dodge.final),
+                    id
+                ).wrap(this.delimiter)
+            }
+
+            _return.actions.push(actionAtk, actionBlock, actionDodge)
+
+            
+            //break
+            if(!!w){
+                let actionBreak = {
+                    name : `${game.i18n.localize('abfalter.breakageShort')}`,
+                    id: `break${w.name}`,
+                    encodedValue: new EncodedValue(
+                        ACTION_TYPE_ID[4],
+                        ACTION_TYPE[7],
+                        w.name,
+                        '',
+                        w._id
+                    ).wrap(this.delimiter)
+                }
+                _return.break.push(actionBreak)
+            }
+
+            return _return
+            
         }
 
         #BuildCombatMultiple(){
@@ -227,22 +349,9 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
             //add custom abilities
             this.actors[0].items.filter(i => i.type === 'secondary').forEach(i => {
                 let data = {
-                    /*armorPen: false,
-                    base: i.system.base,
-                    bonus: 0,
-                    classBonus: 0,*/
                     fav: i.system.fav,
                     final: i.system.base + Math.min(100, this.getStatMod(i.system.atr) * i.system.nat + i.system.natural) + i.system.temp + i.system.spec + i.system.extra,
-                    label: i.name,/*
-                    modValue: this.getStatMod(i.system.atr),
-                    modifier: i.system.atr,
-                    nat: i.system.nat,
-                    natTotal: Math.min(100, this.getStatMod(i.system.atr) * i.system.nat + i.system.natural),
-                    natural: i.system.natural,
-                    parentField: false,
-                    spec: i.system.spec,
-                    status: false,
-                    temp: 0,*/
+                    label: i.name,
                     type: "custom"
                 }
                 abilitiesList.push(data)
@@ -472,6 +581,20 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
 
         async #handleAction(event, actor, token, encodedValue){
             let value = EncodedValue.unwrap(encodedValue, '|')
+
+            let eventValue
+            //TODO
+            // updates case values with CharacterSheet._onWeaponRoll switch values when they are implemented
+            switch(value.actionType){
+                case 'weaponCombatRoll':
+                    eventValue = 'weaponAtk'
+                    break;
+
+                case 'breakageRoll':
+                    eventValue = 'weaponBreak'
+                    break;
+            }
+
             //I don't know enough about JS ¯\_(ツ)_/¯
             let juryriggedEvent = {
                 preventDefault() {},
@@ -480,7 +603,9 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
                     dataset: {
                         label: value.name,
                         roll: value.roll,
-                        type: value.actionType
+                        type: value.actionType,
+                        value: eventValue,
+                        id: value.id
                     }
                 }
             }
@@ -509,6 +634,14 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
                     let item = actor.items.get(value.id)
                     item.system.equipped = !item.system.equipped;
                     item.update({ "system.equipped": item.system.equipped });
+                    break;
+
+                case ACTION_TYPE_ID[4]: //atk
+                    actor.sheet._onWeaponRoll(juryriggedEvent)
+                    break;
+
+                case ACTION_TYPE_ID[5]: //combat
+                    actor.sheet._onAttackRoll(juryriggedEvent)
                     break;
             }
         }
