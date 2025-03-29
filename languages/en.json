@@ -12,18 +12,15 @@
         "per": "Perception",
         "cust": "Custom"
       },
-      "groups":{
+      "equip":"Equip: ",
+      "equipw" : "Equip Weapon",
+      "nemesis": "nemesis",
+      "rinit" : "Roll Initiative",
+      "tabs": {
         "combat": "Combat",
         "ability": "Abilities"
       },
-      "rinit" : "Roll Initiative",
-      "equipw" : "Equip Weapon",
-      "settings": {
-        "displayUnequipped": {
-          "hint": "Choose whether to display unequipped items on the HUD",
-          "name": "Display Unequipped"
-        }
-      }
+      "unequip": "Unequip: "
     }
   }
 }

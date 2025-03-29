@@ -55,15 +55,15 @@ export class EncodedValue {
     }
 }
 export const GROUPS = {
-    combat: { id: 'combat', name: 'tokenActionHud.abfalter.groups.combat', type: 'system' },
+    combat: { id: 'combat', name: 'tokenActionHud.abfalter.tabs.combat', type: 'system' },
 
     initiative: { id: 'initiative', nestId: 'combat_initiative', name: 'abfalter.initiative', type: 'system' },
-    equipWeapon: { id: 'equipweapon', nestId: 'combat_equipweapon', name: 'tokenActionHud.abfalter.equipw', type: 'system' },
+    combatAction: { id: 'combataction', nestId: 'combat_combataction', name: 'tokenActionHud.abfalter.tabs.combat', type: 'system' },
 
-    //rollinit: { id: 'rollinit', nestId: 'combat_initiative_rollinit', /*name: 'tokenActionHud.abfalter.rinit',*/ type: 'system', level: 1},
-    weapons: { id: 'weapons', nestId: 'combat_initiative_weapons', name: 'abfalter.weapons', type: 'system'},
+    //rollinit: { id: 'rollinit', nestId: 'combat_initiative_rollinit', name: 'tokenActionHud.abfalter.rinit', type: 'system-derived'},
+    equipWeapon: { id: 'equip', nestId: 'combat_initiative_equip', name: 'tokenActionHud.abfalter.equipw', type: 'system-derived'},
 //  __________________________________________________
-    abilities: { id: 'ability', name: 'tokenActionHud.abfalter.groups.ability', type: 'system' },
+    abilities: { id: 'ability', name: 'tokenActionHud.abfalter.tabs.ability', type: 'system' },
     
     favAbility: { id: 'favability', nestId: 'ability_favability', name: 'tokenActionHud.abfalter.abillityGroup.fav', type: 'system' },
     athAbility: { id: 'athability', nestId: 'ability_athability', name: 'tokenActionHud.abfalter.abillityGroup.ath', type: 'system' },
@@ -80,6 +80,11 @@ export const GROUPS = {
     resistanceGroup: { id:'resgroup', nestId: 'res_resgroup', name: 'abfalter.resistances', type: 'system'},
 //  __________________________________________________
     ki: { id: 'ki', name: 'abfalter.ki', type: 'system' },
+
+    kiGroup: { id: 'kigroup', nestId: 'ki_kigroup', name: 'abfalter.ki', type: 'system' },
+    nemesisGroup: { id: 'nemesis', nestId: 'ki_nemesis', name: 'tokenActionHud.abfalter.nemesis', type: 'system' },
+
+    kiAbilities: { id: 'kiabs', nestId: 'ki_kigroup_kiabs', name: 'abfalter.kiTab.kiAbilities', type: 'system' },
 //  __________________________________________________
     magic: { id: 'magic', name: 'abfalter.magic', type: 'system' },
 //  __________________________________________________
@@ -106,60 +111,49 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
          * Called by Token Action HUD Core
          * @override
          * @param {array} groupIds
-         */a
+         */
         buildSystemActions(groupIds){
-            this.#BuildCombat()
-            this.#BuildAbilities()
-            this.#BuildRes()
-            /*this.#BuildKi()
-            this.#BuildMagic()
-            this.#BuildPsy()
-            this.#BuildInventory()
-            this.#BuildEffect()*/
+            this.multiple = this.actors.length > 1
+            if(this.multiple){
+                this.#BuildCombatMultiple()
+                this.#BuildAbilities()
+                this.#BuildRes()
+            }
+            else{
+                this.#BuildCombat()
+                this.#BuildAbilities()
+                this.#BuildRes()
+                this.#BuildKi()
+                this.#BuildMagic()
+                this.#BuildPsy()
+                this.#BuildInventory()
+                this.#BuildEffect()
+            }
+
         }
 
         #BuildCombat(){
-            let rollInitAction = [{
-                name: game.i18n.localize('tokenActionHud.abfalter.rinit'),
-                id: 'roll_init',
-                encodedValue: new EncodedValue(
-                    ACTION_TYPE_ID[1],
-                    '',
-                    game.i18n.localize('tokenActionHud.abfalter.rinit'),
-                    '', //no value since we don't need it in actionHandler
-                    ''
-                ).wrap(this.delimiter)
-            }]
-
-            this.multiple = this.actors.length > 1
-
-
-            if(this.multiple){
-                this.addActions(rollInitAction, GROUPS.initiative)
-                return
-            }
-
             let weapons = this.actor.items.filter(i => i.type === 'weapon')
 
             //#region equip weapons
-            let equipWeapons = {
-                unnarmed: []
-            }
+            this.addGroup(GROUPS.equipWeapon, GROUPS.initiative)
 
-            // add equip groups
-            /*weapons.forEach(w => {
+            weapons.forEach(w => {
                 let group = {
-                    id: `weapons${w.name}`,
+                    id: `equip${w.name}`,
                     name: w.name,
                     type: 'system-derived',
-                    listName: `Equip: ${w.name}`,
-                    nestId: `combat_equipweapon_${w.name}`
+                    settings: {showTitle: false}
                 }
 
                 this.addGroup(group, GROUPS.equipWeapon)
+
+                let label = (w.system.equipped) ?
+                    game.i18n.localize('tokenActionHud.abfalter.unequip') + w.name :
+                    game.i18n.localize('tokenActionHud.abfalter.equip') + w.name
                 
                 this.addActions([{
-                    name : `${game.i18n.localize('tokenActionHud.abfalter.equipw')}: ${w.name}`,
+                    name : label,
                     id: `equip_${w.name}`,
                     encodedValue: new EncodedValue(
                         ACTION_TYPE_ID[2],
@@ -169,12 +163,22 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
                         w._id
                     ).wrap(this.delimiter)
                 }], group)
-            })*/
-
-            //this.addGroup(GROUPS.rollinit, GROUPS.initiative)
-
-            this.addActions(rollInitAction, GROUPS.initiative)
+            })
+            
             //#endregion
+            
+            //roll init
+            this.addActions([{
+                name: game.i18n.localize('tokenActionHud.abfalter.rinit'),
+                id: 'roll_init',
+                encodedValue: new EncodedValue(
+                    ACTION_TYPE_ID[1],
+                    '',
+                    game.i18n.localize('tokenActionHud.abfalter.rinit'),
+                    '', //no value since we don't need it in actionHandler
+                    ''
+                ).wrap(this.delimiter)
+            }], GROUPS.initiative)
 
             //addgroup combat
 
@@ -187,8 +191,23 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
             //this.addGroup(combat2G, combatG)
         }
 
+        #BuildCombatMultiple(){
+            let rollInitAction = [{
+                name: game.i18n.localize('tokenActionHud.abfalter.rinit'),
+                id: 'roll_init',
+                encodedValue: new EncodedValue(
+                    ACTION_TYPE_ID[1],
+                    '',
+                    game.i18n.localize('tokenActionHud.abfalter.rinit'),
+                    '', //no value since we don't need it in actionHandler
+                    ''
+                ).wrap(this.delimiter)
+            }]
+
+            this.addActions(rollInitAction, GROUPS.initiative)
+        }
+
         #BuildAbilities(){
-            this.multiple = this.actors.length > 1
             let abilitiesList = []
             Object.entries(this.actors[0].system.secondaryFields).filter(s => s[0] !=='category').forEach(s => Object.entries(s[1]).forEach(a => abilitiesList.push(a[1])))
             //might have to separate abilities from item secondary, depending on how the rollHandler fares
@@ -405,23 +424,30 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
         }
 
         #BuildKi(){
+            if(this.multiple) return;
+            if(this.actor.system.toggles.kiTab)
+                return;
+
+            this.addGroup(GROUPS.kiGroup, GROUPS.ki)
 
         }
 
         #BuildMagic(){
-
+            if(this.multiple) return;
+            if(this.actor.system.toggles.magiciTab) return;
         }
 
         #BuildPsy(){
-
+            if(this.multiple) return;
+            if(this.actor.system.toggles.psychicTab) return;
         }
 
         #BuildInventory(){
-
+            if(this.multiple) return;
         }
 
         #BuildEffect(){
-
+            if(this.multiple) return;
         }
     }
 
@@ -549,7 +575,7 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
                         nestId: groups.combat.id,
                         groups: [
                             { ...groups.initiative },
-                            { ...groups.equipWeapon }
+                            { ...groups.combatAction }
                         ]
                     },
                     {
@@ -569,6 +595,14 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
                     {
                         ...groups.resistances,
                         nestId: groups.resistances.id
+                    },
+                    {
+                        ...groups.ki,
+                        nestId: groups.ki.id,
+                        groups: [
+                            { ...groups.kiGroup },
+                            { ...groups.nemesisGroup }
+                        ]
                     }
                 ],
                 groups: groupsArray
