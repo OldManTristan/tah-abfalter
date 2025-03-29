@@ -34,8 +34,12 @@ export class EncodedValue {
         this.actionTypeId = actionTypeId
         this.actionType = actionType
         this.name = name
-        this.roll = roll
         this.id = id
+
+        if(Object.hasOwn(roll, 'length'))
+            this.roll = roll.split(',')
+        else
+            this.roll = roll
     }
 
     /**
@@ -56,6 +60,26 @@ export class EncodedValue {
     static unwrap(encoded, delimiter){
         let _ = encoded.split(delimiter)
         return new EncodedValue(_[0], _[1], _[2], _[3], _[4])
+    }
+    
+    /**
+     * returns new EncodedValue with a single roll value, and not an array
+     * @param {number} index 
+     * @returns {EncodedValue}
+     */
+    fromRollIndex(index){
+        return new EncodedValue(this.actionTypeId, this.actionType, this.name, this.roll[index], this.id)
+    }
+
+    /**
+     * returns new EncodedValue from string with a single roll value, and not an array
+     * @param {string} original 
+     * @param {string} delimiter 
+     * @param {number} index 
+     * @returns 
+     */
+    static fromRollIndex(original, delimiter, index){
+        return EncodedValue.unwrap(original, delimiter).fromRollIndex(index)
     }
 }
 export const GROUPS = {
@@ -120,8 +144,8 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
             this.multiple = this.actors.length > 1
             if(this.multiple){
                 this.#BuildCombatMultiple()
-                this.#BuildAbilities()
-                this.#BuildRes()
+                this.#BuildAbilitiesMultiple()
+                this.#BuildResMultiple()
             }
             else{
                 this.#BuildCombat()
@@ -220,17 +244,37 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
             }], GROUPS.initiative)
         }
 
+        #BuildCombatMultiple(){
+            
+            if(this.#isUnnarmed()){
+                this.addActions(this.#BuildWeaponActions(null).actions, GROUPS.combatAction)
+            }
+
+            
+            //roll init
+            this.addActions([{
+                name: game.i18n.localize('tokenActionHud.abfalter.rinit'),
+                id: 'roll_init',
+                encodedValue: new EncodedValue(
+                    ACTION_TYPE_ID[1],
+                    '',
+                    game.i18n.localize('tokenActionHud.abfalter.rinit'),
+                    '', //no value since we don't need it in actionHandler
+                    ''
+                ).wrap(this.delimiter)
+            }], GROUPS.initiative)
+        }
+
         /**
          * Returns wether or not this actor is unarmed
          * @param {any[]} weapons 
          * @returns {boolean} true if unarmed, false otherwise
          */
-        #isUnnarmed(weapons){
-            //return true //test only
-            let equipped
+        #isUnnarmed(weapons = []){
             if(weapons.length < 1)
                 return true
 
+            let equipped
             weapons.forEach(w => equipped = equipped || w.system.equipped)
 
             return !equipped
@@ -250,42 +294,51 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
                 actions: [],
                 break: []
             }
-            let unarmed = game.i18n.localize('abfalter.unarmed')
-            let label = (!!w ? w.name : unarmed)
+            let label = (!!w ? w.name : 'unarmed')
             let id = !!w ? w._id : ''
 
+            let atkValues = []
+            let blockValues = []
+            let dodgeValues = []
+            this.actors.forEach(a => {
+                atkValues.push(a.system.combatValues.attack.final)
+                blockValues.push(a.system.combatValues.block.final)
+                dodgeValues.push(a.system.combatValues.dodge.final)
+            })
+
+
             let actionAtk = {
-                name : `${game.i18n.localize('abfalter.attack')}`,
+                name : game.i18n.localize('abfalter.attack'),
                 id: `atk${label}`,
                 encodedValue: new EncodedValue(
                     ACTION_TYPE_ID[(!!w ? 4 : 5)],
                     ACTION_TYPE[(!!w ? 5 : 4)],
-                    label,
-                    (!!w ? '' : this.actor.system.combatValues.attack.final),
+                    (!!w ? w.name : 'attack'),
+                    (!!w ? '' : atkValues.toString()),
                     id
                 ).wrap(this.delimiter)
             }
 
             let actionBlock = {
-                name : `${game.i18n.localize('abfalter.block')}`,
+                name : game.i18n.localize('abfalter.block'),
                 id: `block${label}`,
                 encodedValue: new EncodedValue(
                     ACTION_TYPE_ID[5],
                     ACTION_TYPE[(!!w ? 6 : 4)],
-                    label,
-                    (!!w ? '' : this.actor.system.combatValues.block.final),
+                    (!!w ? w.name : 'block'),
+                    (!!w ? '' : blockValues.toString()),
                     id
                 ).wrap(this.delimiter)
             }
 
             let actionDodge = {
-                name : `${game.i18n.localize('abfalter.dodge')}`,
+                name : game.i18n.localize('abfalter.dodge'),
                 id: `dodge${label}`,
                 encodedValue: new EncodedValue(
                     ACTION_TYPE_ID[5],
                     ACTION_TYPE[(!!w ? 6 : 4)],
-                    label,
-                    (!!w ? '' : this.actor.system.combatValues.dodge.final),
+                    (!!w ? w.name : 'dodge'),
+                    (!!w ? '' : dodgeValues.toString()),
                     id
                 ).wrap(this.delimiter)
             }
@@ -313,25 +366,9 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
             
         }
 
-        #BuildCombatMultiple(){
-            let rollInitAction = [{
-                name: game.i18n.localize('tokenActionHud.abfalter.rinit'),
-                id: 'roll_init',
-                encodedValue: new EncodedValue(
-                    ACTION_TYPE_ID[1],
-                    '',
-                    game.i18n.localize('tokenActionHud.abfalter.rinit'),
-                    '', //no value since we don't need it in actionHandler
-                    ''
-                ).wrap(this.delimiter)
-            }]
-
-            this.addActions(rollInitAction, GROUPS.initiative)
-        }
-
         #BuildAbilities(){
             let abilitiesList = []
-            Object.entries(this.actors[0].system.secondaryFields).filter(s => s[0] !=='category').forEach(s => Object.entries(s[1]).forEach(a => abilitiesList.push(a[1])))
+            Object.entries(this.actor.system.secondaryFields).filter(s => s[0] !=='category').forEach(s => Object.entries(s[1]).forEach(a => abilitiesList.push(a[1])))
             //might have to separate abilities from item secondary, depending on how the rollHandler fares
             let abilities = {
                 fav: [],
@@ -347,7 +384,7 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
             let strPath = 'tokenActionHud.abfalter.abillityGroup.'
 
             //add custom abilities
-            this.actors[0].items.filter(i => i.type === 'secondary').forEach(i => {
+            this.actor.items.filter(i => i.type === 'secondary').forEach(i => {
                 let data = {
                     fav: i.system.fav,
                     final: i.system.base + Math.min(100, this.getStatMod(i.system.atr) * i.system.nat + i.system.natural) + i.system.temp + i.system.spec + i.system.extra,
@@ -361,13 +398,11 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
             abilitiesList.forEach(ab => {
 
                 //abilities needing to be unlocked
-                if(!this.multiple){ //multiple actor selected bypasses this restriction
-                    if(ab.label ==='kiDetection' && !this.actor.system.kiAbility.kiDetection.status)
-                        return
-    
-                    if(ab.label ==='kiConceal' && !this.actor.system.kiAbility.kiConceal.status)
-                        return
-                }
+                if(ab.label ==='kiDetection' && !this.actor.system.kiAbility.kiDetection.status)
+                    return
+
+                if(ab.label ==='kiConceal' && !this.actor.system.kiAbility.kiConceal.status)
+                    return
 
                 let name = ab.type === 'custom' ? ab.label : game.i18n.localize(`abfalter.${ab.label}`)
                 let custLabel = ab.type === 'custom' ? ab.label.replaceAll(' ', '').toLowerCase() : ab.label
@@ -375,7 +410,13 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
                 let data = {
                     name: name,
                     id: `ability_${custLabel}`,
-                    encodedValue: new EncodedValue (ACTION_TYPE_ID[0], ACTION_TYPE[1], custLabel, ab.final, '').wrap(this.delimiter)
+                    encodedValue: new EncodedValue (
+                        ACTION_TYPE_ID[0],
+                        ACTION_TYPE[1],
+                        custLabel,
+                        ab.final,
+                        ''
+                    ).wrap(this.delimiter)
                 }
 
                 switch(ab.label){
@@ -475,6 +516,146 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
             })
         }
 
+        #BuildAbilitiesMultiple(){
+            let abilitiesList = []
+            Object.entries(this.actors[0].system.secondaryFields)
+            .filter(s => s[0] !=='category')
+            .forEach(s => 
+                Object.entries(s[1]).forEach(a => 
+                    abilitiesList.push(a[1])))
+            //might have to separate abilities from item secondary, depending on how the rollHandler fares
+            let abilities = {
+                ath: [],
+                int: [],
+                crea: [],
+                sub: [],
+                soc: [],
+                vig: [],
+                per: [],
+                cust: []
+            }
+
+            //prepare actions
+            abilitiesList.forEach(ab => {
+
+                let name = ab.type === 'custom' ? ab.label : game.i18n.localize(`abfalter.${ab.label}`)
+                let custLabel = ab.type === 'custom' ? ab.label.replaceAll(' ', '').toLowerCase() : ab.label
+
+                let values = []
+                //get rollvalue from each actor for this ability
+                this.actors.forEach(a => {
+                    Object.entries(a.system.secondaryFields).filter(s => s[0] !=='category')
+                    .forEach(c => 
+                        Object.entries(c[1]).forEach(a => {
+                            if(a[1].label != ab.label)
+                                return
+                            values.push(a[1].final)
+                        }))
+                })
+
+                let data = {
+                    name: name,
+                    id: `ability_${custLabel}`,
+                    encodedValue: new EncodedValue (
+                        ACTION_TYPE_ID[0],
+                        ACTION_TYPE[1],
+                        custLabel,
+                        values.toString(),
+                        ''
+                    ).wrap(this.delimiter)
+                }
+
+                switch(ab.label){
+                    case 'acrobatic':
+                    case 'athleticism':
+                    case 'climb':
+                    case 'jump':
+                    case 'piloting':
+                    case 'ride':
+                    case 'swim':
+                        abilities.ath.push(data)
+                        break;
+                    
+                    case 'alchemy':
+                    case 'animism':
+                    case 'art':
+                    case 'cooking':
+                    case 'dance':
+                    case 'forging':
+                    case 'jewelry':
+                    case 'music':
+                    case 'ritualcalig':
+                    case 'runes':
+                    case 'slofhand':
+                    case 'tailoring':
+                    case 'toymaking':
+                        abilities.crea.push(data)
+                        break;
+
+                    case 'animals':
+                    case 'appraisal':
+                    case 'architecture':
+                    case 'herballore':
+                    case 'history':
+                    case 'law':
+                    case 'magicAppr':
+                    case 'medicine':
+                    case 'memorize':
+                    case 'navigation':
+                    case 'occult':
+                    case 'science':
+                    case 'tactics':
+                    case 'technomagic':
+                        abilities.int.push(data)
+                        break;
+                    
+                    case 'kiDetection':
+                    case 'notice':
+                    case 'search':
+                    case 'track':
+                        abilities.per.push(data)
+                        break;
+
+                    case 'etiquette':
+                    case 'intimidate':
+                    case 'leadership':
+                    case 'persuasion':
+                    case 'streetwise':
+                    case 'style':
+                    case 'trading':
+                        abilities.soc.push(data)
+                        break;
+
+                    case 'disguise':
+                    case 'hide':
+                    case 'kiConceal':
+                    case 'lockpicking':
+                    case 'poisons':
+                    case 'stealth':
+                    case 'theft':
+                    case 'traplore':
+                        abilities.sub.push(data)
+                        break;
+
+                    case 'composure':
+                    case 'featsofstr':
+                    case 'withstpain':
+                        abilities.vig.push(data)
+                        break;
+                }
+            })
+
+            let parentGroup = GROUPS.abilities
+            Object.values(abilities).forEach((_, i) => {
+                let abID = `${Object.keys(abilities)[i]}${parentGroup.id}` //TODO add switch to short names is setting set
+                let currentGroup = Object.values(GROUPS).find(i => i.id === abID)
+
+                this.addGroup(currentGroup, parentGroup, true)
+
+                this.addActions(_, currentGroup)
+            })
+        }
+
         /**
          * Get the mod value associated to parameter
          * @param {*} name 
@@ -532,6 +713,66 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
             })
         }
 
+        #BuildResMultiple(){
+
+            this.addGroup(GROUPS.resistanceGroup, GROUPS.resistances)
+
+            let res = {
+                Physical: {
+                    values: [],
+                    res: this.actors[0].system.resistances.Physical
+                },
+                Disease: {
+                    values: [],
+                    res: this.actors[0].system.resistances.Disease
+                },
+                Poison: {
+                    values: [],
+                    res: this.actors[0].system.resistances.Poison
+                },
+                Magic: {
+                    values: [],
+                    res: this.actors[0].system.resistances.Magic
+                },
+                Psychic: {
+                    values: [],
+                    res: this.actors[0].system.resistances.Psychic
+                }
+            }
+
+            let resList = [
+                this.actors[0].system.resistances.Physical,
+                this.actors[0].system.resistances.Disease,
+                this.actors[0].system.resistances.Poison,
+                this.actors[0].system.resistances.Magic,
+                this.actors[0].system.resistances.Psychic
+            ]
+
+            this.actors.forEach(a => {
+                let _ = a.system.resistances
+
+                res.Physical.values.push(_.Physical.final)
+                res.Disease.values.push(_.Disease.final)
+                res.Poison.values.push(_.Poison.final)
+                res.Magic.values.push(_.Magic.final)
+                res.Psychic.values.push(_.Psychic.final)
+            })
+
+            Object.values(res).forEach(r => {
+
+                this.addActions([{
+                    id: `${GROUPS.resistances.id}_${r.res.name}`,
+                    name: r.res.name,
+                    encodedValue: new EncodedValue (
+                        ACTION_TYPE_ID[3],
+                        ACTION_TYPE[6],
+                        r.res.name,
+                        r.values.toString(),
+                        '').wrap(this.delimiter)
+                }], GROUPS.resistanceGroup)
+            })
+        }
+
         #BuildKi(){
             if(this.multiple) return;
             if(this.actor.system.toggles.kiTab)
@@ -574,14 +815,13 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
         async handleActionClick (event, encodedValue){
             let tokens = canvas.tokens.controlled.filter(t => t.actor?.type === 'character')
 
-            tokens.forEach(async t => {
-                await this.#handleAction(event, t.actor, t, encodedValue)
+            tokens.forEach(async (t, i) => {
+                await this.#handleAction(event, t.actor, t, EncodedValue.fromRollIndex(encodedValue, '|', i).wrap('|'))
             })
         }
 
         async #handleAction(event, actor, token, encodedValue){
             let value = EncodedValue.unwrap(encodedValue, '|')
-
             let eventValue
             //TODO
             // updates case values with CharacterSheet._onWeaponRoll switch values when they are implemented
