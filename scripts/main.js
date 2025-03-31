@@ -21,6 +21,11 @@ export const ACTION_TYPE_ID = [
     'res',
     'atk',
     'combat',
+    'item',
+    'kiaccu',
+    'kiaccuhalf',
+    'maccu',
+    'maccuhalf',
 ]
 export class EncodedValue {
 
@@ -83,15 +88,18 @@ export class EncodedValue {
     }
 }
 export const GROUPS = {
-    combat: { id: 'combat', name: 'tokenActionHud.abfalter.tabs.combat', type: 'system' },
+    //#region Combat
+    combat: { id: 'combat', nestId: 'combat', name: 'tokenActionHud.abfalter.tabs.combat', type: 'system' },
 
     initiative: { id: 'initiative', nestId: 'combat_initiative', name: 'abfalter.initiative', type: 'system' },
     combatAction: { id: 'combataction', nestId: 'combat_combataction', name: 'tokenActionHud.abfalter.tabs.combat', type: 'system' },
 
     //rollinit: { id: 'rollinit', nestId: 'combat_initiative_rollinit', name: 'tokenActionHud.abfalter.rinit', type: 'system-derived'},
     equipWeapon: { id: 'equip', nestId: 'combat_initiative_equip', name: 'tokenActionHud.abfalter.equipw', type: 'system-derived'},
-//  __________________________________________________
-    abilities: { id: 'ability', name: 'tokenActionHud.abfalter.tabs.ability', type: 'system' },
+    //#endregion
+
+    //#region Ability
+    abilities: { id: 'ability', nestId: 'ability', name: 'tokenActionHud.abfalter.tabs.ability', type: 'system' },
     
     favAbility: { id: 'favability', nestId: 'ability_favability', name: 'tokenActionHud.abfalter.abillityGroup.fav', type: 'system' },
     athAbility: { id: 'athability', nestId: 'ability_athability', name: 'tokenActionHud.abfalter.abillityGroup.ath', type: 'system' },
@@ -102,27 +110,75 @@ export const GROUPS = {
     vigAbility: { id: 'vigability', nestId: 'ability_vigability', name: 'tokenActionHud.abfalter.abillityGroup.vig', type: 'system' },
     perAbility: { id: 'perability', nestId: 'ability_perability', name: 'tokenActionHud.abfalter.abillityGroup.per', type: 'system' },
     custAbility: { id: 'custability', nestId: 'ability_custability', name: 'tokenActionHud.abfalter.abillityGroup.cust', type: 'system' },
-//  __________________________________________________
+    //#endregion
+
+    //#region Resistances 
     resistances: { id:'res', name: 'abfalter.resistances', type: 'system'},
 
     resistanceGroup: { id:'resgroup', nestId: 'res_resgroup', name: 'abfalter.resistances', type: 'system'},
-//  __________________________________________________
+    //#endregion
+
+    //#region Ki
     ki: { id: 'ki', name: 'abfalter.ki', type: 'system' },
 
     kiGroup: { id: 'kigroup', nestId: 'ki_kigroup', name: 'abfalter.ki', type: 'system' },
     nemesisGroup: { id: 'nemesis', nestId: 'ki_nemesis', name: 'tokenActionHud.abfalter.nemesis', type: 'system' },
 
     kiAbilities: { id: 'kiabs', nestId: 'ki_kigroup_kiabs', name: 'abfalter.kiTab.kiAbilities', type: 'system' },
-//  __________________________________________________
+    //#endregion
+
+    //#region Magic
     magic: { id: 'magic', name: 'abfalter.magic', type: 'system' },
-//  __________________________________________________
+
+    magicAcc: { id: 'maccu', nestId: 'magic_maccu', name: 'abfalter.maccu', type: 'system' },
+
+    magicProj: { id: 'mproj', nestId: 'magic_mproj', name: 'abfalter.mproj', type: 'system' },
+    spellBook: { id: 'spellbook', nestId: 'magic_spellbook', name: 'abfalter.spellBook', type: 'system' },
+
+    pathLight: { id: 'pathlight', nestId: 'magic_spellbook_pathlight', name: 'tokenActionHud.abfalter.mpath.light', type: 'system' },
+    pathDark: { id: 'pathdark', nestId: 'magic_spellbook_pathdark', name: 'tokenActionHud.abfalter.mpath.darkness', type: 'system' },
+    pathCrea: { id: 'pathcrea', nestId: 'magic_spellbook_pathcrea', name: 'tokenActionHud.abfalter.mpath.creation', type: 'system' },
+    pathDest: { id: 'pathdest', nestId: 'magic_spellbook_pathdest', name: 'tokenActionHud.abfalter.mpath.destruction', type: 'system' },
+    pathAir: { id: 'pathair', nestId: 'magic_spellbook_pathair', name: 'tokenActionHud.abfalter.mpath.air', type: 'system' },
+    pathWater: { id: 'pathwat', nestId: 'magic_spellbook_pathwat', name: 'tokenActionHud.abfalter.mpath.water', type: 'system' },
+    pathFire: { id: 'pathfire', nestId: 'magic_spellbook_pathfire', name: 'tokenActionHud.abfalter.mpath.fire', type: 'system' },
+    pathEarth: { id: 'pathearth', nestId: 'magic_spellbook_pathearth', name: 'tokenActionHud.abfalter.mpath.earth', type: 'system' },
+    pathEss: { id: 'pathess', nestId: 'magic_spellbook_pathess', name: 'tokenActionHud.abfalter.mpath.essence', type: 'system' },
+    pathIll: { id: 'pathill', nestId: 'magic_spellbook_pathill', name: 'tokenActionHud.abfalter.mpath.illusion', type: 'system' },
+    pathNec: { id: 'pathnec', nestId: 'magic_spellbook_pathnec', name: 'tokenActionHud.abfalter.mpath.necromancy', type: 'system' },
+    pathFree: { id: 'pathfree', nestId: 'magic_spellbook_pathfree', name: 'tokenActionHud.abfalter.mpath.free', type: 'system' },
+    pathChaos: { id: 'pathchaos', nestId: 'magic_spellbook_pathchaos', name: 'tokenActionHud.abfalter.mpath.chaos', type: 'system' },
+    pathKnow: { id: 'pathknow', nestId: 'magic_spellbook_pathknow', name: 'tokenActionHud.abfalter.mpath.knowledge', type: 'system' },
+    pathWar: { id: 'pathwar', nestId: 'magic_spellbook_pathwar', name: 'tokenActionHud.abfalter.mpath.war', type: 'system' },
+    pathLit: { id: 'pathlit', nestId: 'magic_spellbook_pathlit', name: 'tokenActionHud.abfalter.mpath.literature', type: 'system' },
+    pathDeath: { id: 'pathdeath', nestId: 'magic_spellbook_pathdeath', name: 'tokenActionHud.abfalter.mpath.death', type: 'system' },
+    pathMusic: { id: 'pathmusic', nestId: 'magic_spellbook_pathmusic', name: 'tokenActionHud.abfalter.mpath.music', type: 'system' },
+    pathNob: { id: 'pathnob', nestId: 'magic_spellbook_pathnob', name: 'tokenActionHud.abfalter.mpath.nobility', type: 'system' },
+    pathPeace: { id: 'pathpeace', nestId: 'magic_spellbook_pathpeace', name: 'tokenActionHud.abfalter.mpath.peace', type: 'system' },
+    pathSin: { id: 'pathsin', nestId: 'magic_spellbook_pathsin', name: 'tokenActionHud.abfalter.mpath.sin', type: 'system' },
+    pathBlood: { id: 'pathblood', nestId: 'magic_spellbook_pathblood', name: 'tokenActionHud.abfalter.mpath.blood', type: 'system' },
+    pathUmbra: { id: 'pathumbra', nestId: 'magic_spellbook_pathumbra', name: 'tokenActionHud.abfalter.mpath.umbra', type: 'system' },
+    pathDream: { id: 'pathdream', nestId: 'magic_spellbook_pathdream', name: 'tokenActionHud.abfalter.mpath.dreams', type: 'system' },
+    pathTime: { id: 'pathtime', nestId: 'magic_spellbook_pathtime', name: 'tokenActionHud.abfalter.mpath.time', type: 'system' },
+    pathVoid: { id: 'pathvoid', nestId: 'magic_spellbook_pathvoid', name: 'tokenActionHud.abfalter.mpath.void', type: 'system' },
+    pathCust: { id: 'pathcust', nestId: 'magic_spellbook_pathcust', name: 'tokenActionHud.abfalter.mpath.custom', type: 'system' },
+    //#endregion
+
+    //#region Psy
     psy: { id: 'psy', name: 'abfalter.psychic', type: 'system' },
-//  __________________________________________________
+    //#endregion
+
+    //#region Inventory
     inventory: { id: 'inventory', name: 'abfalter.inventory', type: 'system' },
-//  __________________________________________________
+    //#endregion
+
+    //#region Effects
     effects: { id: 'effects', name: 'abfalter.effects', type: 'system' },
-//  __________________________________________________
+    //#endregion
+
+    //#region Utility
     utility: { id: 'utility', name: 'tokenActionHud.utility', type: 'system' },
+    //#endregion
 }
 
 Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
@@ -381,7 +437,6 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
                 per: [],
                 cust: []
             }
-            let strPath = 'tokenActionHud.abfalter.abillityGroup.'
 
             //add custom abilities
             this.actor.items.filter(i => i.type === 'secondary').forEach(i => {
@@ -505,12 +560,11 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
                     abilities.fav.push(data)
             })
 
-            let parentGroup = GROUPS.abilities
             Object.values(abilities).forEach((_, i) => {
-                let abID = `${Object.keys(abilities)[i]}${parentGroup.id}` //TODO add switch to short names is setting set
+                let abID = `${Object.keys(abilities)[i]}${GROUPS.abilities.id}` //TODO add switch to short names is setting set
                 let currentGroup = Object.values(GROUPS).find(i => i.id === abID)
 
-                this.addGroup(currentGroup, parentGroup, true)
+                this.addGroup(currentGroup, GROUPS.abilities)
 
                 this.addActions(_, currentGroup)
             })
@@ -783,13 +837,391 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
         }
 
         #BuildMagic(){
-            if(this.multiple) return;
-            if(this.actor.system.toggles.magiciTab) return;
+            if(this.actor.system.toggles.magicTab) return;
+
+            let system = this.actor.system
+
+            let accu = [{
+                id: 'maccuhalf',
+                name: game.i18n.localize('abfalter.half'),
+                encodedValue: new EncodedValue (
+                    ACTION_TYPE_ID[10],
+                    '',
+                    game.i18n.localize('abfalter.half'),
+                    '',
+                    '').wrap(this.delimiter)
+            },
+            {
+                id: 'maccufull',
+                name: game.i18n.localize('abfalter.full'),
+                encodedValue: new EncodedValue (
+                    ACTION_TYPE_ID[9],
+                    '',
+                    game.i18n.localize('abfalter.full'),
+                    '',
+                    '').wrap(this.delimiter)
+            }]
+            
+            //TODO setting accu
+            if(null)
+                this.addActions(accu, GROUPS.magicAcc)
+
+            let def
+            if(system.toggles.magicDefModule)
+                def = system.mproj.defModule
+            else if(system.toggles.magicDodgeModule)
+                def = system.mproj.dodModule
+            else
+                def = system.mproj.finalDefensive
+
+            //TODO maybe
+            //setting for short or long off/def
+            let proj = [{
+                id: 'mprojoff',
+                name: game.i18n.localize('abfalter.offensive1'),
+                encodedValue: new EncodedValue (
+                    ACTION_TYPE_ID[5],
+                    ACTION_TYPE[5],
+                    game.i18n.localize('abfalter.offMagicProj'),
+                    system.toggles.magicAtkModule ? system.mproj.atkModule : system.mproj.finalOffensive,
+                    '').wrap(this.delimiter)
+            },{
+                id: 'mprojdef',
+                name: game.i18n.localize('abfalter.defensive1'),
+                encodedValue: new EncodedValue (
+                    ACTION_TYPE_ID[5],
+                    ACTION_TYPE[5],
+                    game.i18n.localize('abfalter.defMagicProj'),
+                    def,
+                    '').wrap(this.delimiter)
+            }]
+
+            this.addActions(proj, GROUPS.magicProj)
+
+            //spell book
+
+            let spellList = []
+            let paths = {
+                light: [],
+                darkness: [],
+                creation: [],
+                destruction: [],
+                air: [],
+                water: [],
+                fire: [],
+                earth: [],
+                essence: [],
+                illusion: [],
+                necromancy: [],
+                free: [],
+                chaos: [],
+                knowledge: [],
+                war: [],
+                literature: [],
+                death: [],
+                music: [],
+                nobility: [],
+                peace: [],
+                blood: [],
+                umbra: [],
+                dreams: [],
+                sin: [],
+                time: [],
+                _void: [],
+                custom: [],
+            }
+
+            spellList = this.actor.items.filter(i => i.type === 'spell')
+
+            if(spellList.length < 1) return
+
+            spellList.forEach(s => {
+                switch(s.system.path.toLowerCase()){
+                    case game.i18n.localize('tokenActionHud.abfalter.mpath.light').toLowerCase():
+                        paths.light.push(s)
+                        break;
+                    
+                    case game.i18n.localize('tokenActionHud.abfalter.mpath.darkness').toLowerCase():
+                        paths.darkness.push(s)
+                        break;
+                            
+                    case game.i18n.localize('tokenActionHud.abfalter.mpath.creation').toLowerCase():
+                        paths.creation.push(s)
+                        break;
+                        
+                    case game.i18n.localize('tokenActionHud.abfalter.mpath.destruction').toLowerCase():
+                        paths.destruction.push(s)
+                        break;
+                        
+                    case game.i18n.localize('tokenActionHud.abfalter.mpath.air').toLowerCase():
+                        paths.air.push(s)
+                        break;
+                        
+                    case game.i18n.localize('tokenActionHud.abfalter.mpath.water').toLowerCase():
+                        paths.water.push(s)
+                        break;
+                        
+                    case game.i18n.localize('tokenActionHud.abfalter.mpath.fire').toLowerCase():
+                        paths.fire.push(s)
+                        break;
+                        
+                    case game.i18n.localize('tokenActionHud.abfalter.mpath.earth').toLowerCase():
+                        paths.earth.push(s)
+                        break;
+                        
+                    case game.i18n.localize('tokenActionHud.abfalter.mpath.essence').toLowerCase():
+                        paths.essence.push(s)
+                        break;
+                        
+                    case game.i18n.localize('tokenActionHud.abfalter.mpath.illusion').toLowerCase():
+                        paths.illusion.push(s)
+                        break;
+                        
+                    case game.i18n.localize('tokenActionHud.abfalter.mpath.necromancy').toLowerCase():
+                        paths.necromancy.push(s)
+                        break;
+                        
+                    case game.i18n.localize('tokenActionHud.abfalter.mpath.free').toLowerCase():
+                        paths.free.push(s)
+                        break;
+                        
+                    case game.i18n.localize('tokenActionHud.abfalter.mpath.chaos').toLowerCase():
+                        paths.chaos.push(s)
+                        break;
+                        
+                    case game.i18n.localize('tokenActionHud.abfalter.mpath.knowledge').toLowerCase():
+                        paths.knowledge.push(s)
+                        break;
+                        
+                    case game.i18n.localize('tokenActionHud.abfalter.mpath.war').toLowerCase():
+                        paths.war.push(s)
+                        break;
+                        
+                    case game.i18n.localize('tokenActionHud.abfalter.mpath.literature').toLowerCase():
+                        paths.literature.push(s)
+                        break;
+                        
+                    case game.i18n.localize('tokenActionHud.abfalter.mpath.death').toLowerCase():
+                        paths.death.push(s)
+                        break;
+                        
+                    case game.i18n.localize('tokenActionHud.abfalter.mpath.music').toLowerCase():
+                        paths.music.push(s)
+                        break;
+                        
+                    case game.i18n.localize('tokenActionHud.abfalter.mpath.nobility').toLowerCase():
+                        paths.nobility.push(s)
+                        break;
+                        
+                    case game.i18n.localize('tokenActionHud.abfalter.mpath.peace').toLowerCase():
+                        paths.peace.push(s)
+                        break;
+                        
+                    case game.i18n.localize('tokenActionHud.abfalter.mpath.blood').toLowerCase():
+                        paths.blood.push(s)
+                        break;
+                    
+                    case game.i18n.localize('tokenActionHud.abfalter.mpath.umbra').toLowerCase():
+                        paths.umbra.push(s)
+                        break;
+                
+                    case game.i18n.localize('tokenActionHud.abfalter.mpath.dreams').toLowerCase():
+                        paths.dreams.push(s)
+                        break;
+            
+                    case game.i18n.localize('tokenActionHud.abfalter.mpath.sin').toLowerCase():
+                        paths.sin.push(s)
+                        break;
+            
+                    case game.i18n.localize('tokenActionHud.abfalter.mpath.time').toLowerCase():
+                        paths.time.push(s)
+                        break;
+        
+                    case game.i18n.localize('tokenActionHud.abfalter.mpath.void').toLowerCase():
+                        paths._void.push(s)
+                        break;
+    
+                    default:
+                        paths.custom.push(s)
+                        break;
+
+                }
+            })
+
+            Object.values(paths).forEach(p => {
+                p.sort(this.#sortSpellsASC)
+                let spells = []
+                p.forEach(s => {
+                    spells.push({
+                        id: `spell_${s._id}`,
+                        name: s.name,
+                        encodedValue: new EncodedValue (
+                            ACTION_TYPE_ID[6],
+                            s.system.path,
+                            s.name,
+                            '',
+                            s._id).wrap(this.delimiter)
+                    })
+                })
+                if(spells.length < 1) return
+                let temp = EncodedValue.unwrap(spells[0].encodedValue, this.delimiter)
+                switch(temp.actionType.toLowerCase()){
+                    case game.i18n.localize('tokenActionHud.abfalter.mpath.light').toLowerCase():
+                        this.addGroup(GROUPS.pathLight, GROUPS.spellBook)
+                        this.addActions(spells, GROUPS.pathLight)
+                        break;
+                    
+                    case game.i18n.localize('tokenActionHud.abfalter.mpath.darkness').toLowerCase():
+                        this.addGroup(GROUPS.pathDark, GROUPS.spellBook)
+                        this.addActions(spells, GROUPS.pathDark)
+                        break;
+                            
+                    case game.i18n.localize('tokenActionHud.abfalter.mpath.creation').toLowerCase():
+                        this.addGroup(GROUPS.pathCrea, GROUPS.spellBook)
+                        this.addActions(spells, GROUPS.pathCrea)
+                        break;
+                        
+                    case game.i18n.localize('tokenActionHud.abfalter.mpath.destruction').toLowerCase():
+                        this.addGroup(GROUPS.pathDest, GROUPS.spellBook)
+                        this.addActions(spells, GROUPS.pathDest)
+                        break;
+                        
+                    case game.i18n.localize('tokenActionHud.abfalter.mpath.air').toLowerCase():
+                        this.addGroup(GROUPS.pathAir, GROUPS.spellBook)
+                        this.addActions(spells, GROUPS.pathAir)
+                        break;
+                        
+                    case game.i18n.localize('tokenActionHud.abfalter.mpath.water').toLowerCase():
+                        this.addGroup(GROUPS.pathWater, GROUPS.spellBook)
+                        this.addActions(spells, GROUPS.pathWater)
+                        break;
+                        
+                    case game.i18n.localize('tokenActionHud.abfalter.mpath.fire').toLowerCase():
+                        this.addGroup(GROUPS.pathFire, GROUPS.spellBook)
+                        this.addActions(spells, GROUPS.pathFire)
+                        break;
+                        
+                    case game.i18n.localize('tokenActionHud.abfalter.mpath.earth').toLowerCase():
+                        this.addGroup(GROUPS.pathEarth, GROUPS.spellBook)
+                        this.addActions(spells, GROUPS.pathEarth)
+                        break;
+                        
+                    case game.i18n.localize('tokenActionHud.abfalter.mpath.essence').toLowerCase():
+                        this.addGroup(GROUPS.pathEss, GROUPS.spellBook)
+                        this.addActions(spells, GROUPS.pathEss)
+                        break;
+                        
+                    case game.i18n.localize('tokenActionHud.abfalter.mpath.illusion').toLowerCase():
+                        this.addGroup(GROUPS.pathIll, GROUPS.spellBook)
+                        this.addActions(spells, GROUPS.pathIll)
+                        break;
+                        
+                    case game.i18n.localize('tokenActionHud.abfalter.mpath.necromancy').toLowerCase():
+                        this.addGroup(GROUPS.pathNec, GROUPS.spellBook)
+                        this.addActions(spells, GROUPS.pathNec)
+                        break;
+                        
+                    case game.i18n.localize('tokenActionHud.abfalter.mpath.free').toLowerCase():
+                        this.addGroup(GROUPS.pathFree, GROUPS.spellBook)
+                        this.addActions(spells, GROUPS.pathFree)
+                        break;
+                        
+                    case game.i18n.localize('tokenActionHud.abfalter.mpath.chaos').toLowerCase():
+                        this.addGroup(GROUPS.pathChaos, GROUPS.spellBook)
+                        this.addActions(spells, GROUPS.pathChaos)
+                        break;
+                        
+                    case game.i18n.localize('tokenActionHud.abfalter.mpath.knowledge').toLowerCase():
+                        this.addGroup(GROUPS.pathKnow, GROUPS.spellBook)
+                        this.addActions(spells, GROUPS.pathKnow)
+                        break;
+                        
+                    case game.i18n.localize('tokenActionHud.abfalter.mpath.war').toLowerCase():
+                        this.addGroup(GROUPS.pathWar, GROUPS.spellBook)
+                        this.addActions(spells, GROUPS.pathWar)
+                        break;
+                        
+                    case game.i18n.localize('tokenActionHud.abfalter.mpath.literature').toLowerCase():
+                        this.addGroup(GROUPS.pathLit, GROUPS.spellBook)
+                        this.addActions(spells, GROUPS.pathLit)
+                        break;
+                        
+                    case game.i18n.localize('tokenActionHud.abfalter.mpath.death').toLowerCase():
+                        this.addGroup(GROUPS.pathDeath, GROUPS.spellBook)
+                        this.addActions(spells, GROUPS.pathDeath)
+                        break;
+                        
+                    case game.i18n.localize('tokenActionHud.abfalter.mpath.music').toLowerCase():
+                        this.addGroup(GROUPS.pathMusic, GROUPS.spellBook)
+                        this.addActions(spells, GROUPS.pathMusic)
+                        break;
+                        
+                    case game.i18n.localize('tokenActionHud.abfalter.mpath.nobility').toLowerCase():
+                        this.addGroup(GROUPS.pathNob, GROUPS.spellBook)
+                        this.addActions(spells, GROUPS.pathNob)
+                        break;
+                        
+                    case game.i18n.localize('tokenActionHud.abfalter.mpath.peace').toLowerCase():
+                        this.addGroup(GROUPS.pathPeace, GROUPS.spellBook)
+                        this.addActions(spells, GROUPS.pathPeace)
+                        break;
+                        
+                    case game.i18n.localize('tokenActionHud.abfalter.mpath.blood').toLowerCase():
+                        this.addGroup(GROUPS.pathBlood, GROUPS.spellBook)
+                        this.addActions(spells, GROUPS.pathBlood)
+                        break;
+                    
+                    case game.i18n.localize('tokenActionHud.abfalter.mpath.umbra').toLowerCase():
+                        this.addGroup(GROUPS.pathUmbra, GROUPS.spellBook)
+                        this.addActions(spells, GROUPS.pathUmbra)
+                        break;
+                
+                    case game.i18n.localize('tokenActionHud.abfalter.mpath.dreams').toLowerCase():
+                        this.addGroup(GROUPS.pathDream, GROUPS.spellBook)
+                        this.addActions(spells, GROUPS.pathDream)
+                        break;
+
+                    case game.i18n.localize('tokenActionHud.abfalter.mpath.sin').toLowerCase():
+                        this.addGroup(GROUPS.pathSin, GROUPS.spellBook)
+                        this.addActions(spells, GROUPS.pathSin)
+                        break;
+            
+                    case game.i18n.localize('tokenActionHud.abfalter.mpath.time').toLowerCase():
+                        this.addGroup(GROUPS.pathTime, GROUPS.spellBook)
+                        this.addActions(spells, GROUPS.pathTime)
+                        break;
+        
+                    case game.i18n.localize('tokenActionHud.abfalter.mpath.void').toLowerCase():
+                        this.addGroup(GROUPS.pathVoid, GROUPS.spellBook)
+                        this.addActions(spells, GROUPS.pathVoid)
+                        break;
+    
+                    default:
+                        this.addGroup(GROUPS.pathCust, GROUPS.spellBook)
+                        this.addActions(spells, GROUPS.pathCust)
+                        break;
+
+                }
+            })
+        }
+
+        /**
+         * Algorithm to sort spells by ascending level
+         */
+        #sortSpellsASC(a, b){
+            return a.system.level - b.system.level
         }
 
         #BuildPsy(){
-            if(this.multiple) return;
             if(this.actor.system.toggles.psychicTab) return;
+
+            //potential
+            //combatroll
+
+            //proj
+            //attackroll
+
+            //matrices
         }
 
         #BuildInventory(){
@@ -883,6 +1315,11 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
                 case ACTION_TYPE_ID[5]: //combat
                     actor.sheet._onAttackRoll(juryriggedEvent)
                     break;
+
+                case ACTION_TYPE_ID[6]: //item
+                    actor.items.get(value.id).roll(value.name)
+                    break;
+
             }
         }
     }
@@ -975,6 +1412,15 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
                         groups: [
                             { ...groups.kiGroup },
                             { ...groups.nemesisGroup }
+                        ]
+                    },
+                    {
+                        ...groups.magic,
+                        nestId: groups.magic.id,
+                        groups: [
+                            { ...groups.magicAcc },
+                            { ...groups.magicProj },
+                            { ...groups.spellBook }
                         ]
                     }
                 ],
