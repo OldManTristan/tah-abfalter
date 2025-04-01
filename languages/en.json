@@ -46,6 +46,22 @@
       "nemesis": "Nemesis",
       "nemabs": "Nemesis Abilities",
       "rinit" : "Roll Initiative",
+      "settings": {
+        "weaponImageName": "Show weapon image",
+        "weaponImageHint": "Show the weapon icon before its combat actions.",
+        "weaponBreakActionName": "Show break action",
+        "weaponBreakActionHint": "Show the break action with weapon actions.",
+        "weaponForceUnarmedName": "Force show basic combat",
+        "weaponForceUnarmedHint": "Show basic combat actions even when weapons are equiped.",
+        "shortMagicProjName": "Short magic projection",
+        "shortMagicProjHint": "Shortens magic projection action name.",
+        "showAccuKiName": "Show ki accu actions",
+        "showAccuKiHint": "not implemented yet",
+        "showKiAbilityName": "Show Ki & Nemesis abilities",
+        "showKiAbilityHint": "It is only for info purposes, actions will do nothing.",
+        "showAccuMagicName": "Show Magic accu actions",
+        "showAccuMagicHint": "not implemented yet."
+      },
       "tabs": {
         "combat": "Combat",
         "ability": "Abilities"

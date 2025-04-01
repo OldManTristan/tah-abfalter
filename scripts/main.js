@@ -212,6 +212,17 @@ export const GROUPS = {
     //#endregion
 }
 
+export const MODULEID = 'tah-abfalter'
+export const Settings = {
+    weaponImage: 'weaponImage',
+    weaponBreakAction: 'weaponBreakAction',
+    weaponForceUnarmed: 'weaponForceUnarmed',
+    shortMagicProj: 'shortMagicProj',
+    showAccuKi: 'showAccuKi',
+    showKiAbility: 'showKiAbility',
+    showAccuMagic: 'showAccuMagic'
+}
+
 Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
 
     /**
@@ -291,7 +302,8 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
                 //TODO
                 //setting show image
 
-                groupCombat.settings.image = w.img
+                if(game.settings.get(MODULEID, Settings.weaponImage))
+                    groupCombat.settings.image = w.img
 
                 this.addGroup(groupCombat, GROUPS.combatAction)
 
@@ -300,18 +312,14 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
                 this.addActions(wActions.actions, groupCombat)
 
 
-                
-                //TODO
                 // setting show break
-
-                this.addActions((wActions.break || []), groupCombat)
+                if(game.settings.get(MODULEID, Settings.weaponBreakAction))
+                    this.addActions((wActions.break || []), groupCombat)
                 //#endregion
             })
 
             //add unarmed weapon, just in case
-            //TODO
-            //setting show basic
-            if(this.#isUnnarmed(weapons) /* || setting*/){
+            if(this.#isUnnarmed(weapons)  || game.settings.get(MODULEID, Settings.weaponForceUnarmed)){
                 this.addActions(this.#BuildWeaponActions(null).actions, GROUPS.combatAction)
             }
             
@@ -588,7 +596,7 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
             })
 
             Object.values(abilities).forEach((_, i) => {
-                let abID = `${Object.keys(abilities)[i]}${GROUPS.abilities.id}` //TODO add switch to short names is setting set
+                let abID = `${Object.keys(abilities)[i]}${GROUPS.abilities.id}`
                 let currentGroup = Object.values(GROUPS).find(i => i.id === abID)
 
                 this.addGroup(currentGroup, GROUPS.abilities)
@@ -727,7 +735,7 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
 
             let parentGroup = GROUPS.abilities
             Object.values(abilities).forEach((_, i) => {
-                let abID = `${Object.keys(abilities)[i]}${parentGroup.id}` //TODO add switch to short names is setting set
+                let abID = `${Object.keys(abilities)[i]}${parentGroup.id}`
                 let currentGroup = Object.values(GROUPS).find(i => i.id === abID)
 
                 this.addGroup(currentGroup, parentGroup, true)
@@ -860,45 +868,49 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
             let kiAbs = []
             let nemAbs = []
 
-            Object.entries(this.actor.system.kiAbility).forEach(a => {
-                if(!a[1].status) return
 
-                if(a[0].includes('nemi') || a[0].includes('Nemesis'))
-                    nemAbs.push(a)
-                else
-                    kiAbs.push(a)
-            })
+            if(game.settings.get(MODULEID, Settings.showKiAbility)){
 
-            let actions = []
-            //ki abs
-            kiAbs.forEach(a => {
-                actions.push(new ActionData(
-                    game.i18n.localize(`abfalter.kiTab.${a[0]}`), a[0],
-                    new EncodedValue(
-                        '',
-                        '',
-                        a[0],
-                        '',
-                        ''
-                    ).wrap(this.delimiter)
-                ))
-            })
-            this.addActions(actions, GROUPS.kiAbilities)
-            actions = []
-            //nem abs
-            nemAbs.forEach(a => {
-                actions.push(new ActionData(
-                    game.i18n.localize(`abfalter.kiTab.${a[0]}`), a[0],
-                    new EncodedValue(
-                        '',
-                        '',
-                        a[0],
-                        '',
-                        ''
-                    ).wrap(this.delimiter)
-                ))
-            })
-            this.addActions(actions, GROUPS.nemAbilities)
+                Object.entries(this.actor.system.kiAbility).forEach(a => {
+                    if(!a[1].status) return
+    
+                    if(a[0].includes('nemi') || a[0].includes('Nemesis'))
+                        nemAbs.push(a)
+                    else
+                        kiAbs.push(a)
+                })
+    
+                let actions = []
+                //ki abs
+                kiAbs.forEach(a => {
+                    actions.push(new ActionData(
+                        game.i18n.localize(`abfalter.kiTab.${a[0]}`), a[0],
+                        new EncodedValue(
+                            '',
+                            '',
+                            a[0],
+                            '',
+                            ''
+                        ).wrap(this.delimiter)
+                    ))
+                })
+                this.addActions(actions, GROUPS.kiAbilities)
+                actions = []
+                //nem abs
+                nemAbs.forEach(a => {
+                    actions.push(new ActionData(
+                        game.i18n.localize(`abfalter.kiTab.${a[0]}`), a[0],
+                        new EncodedValue(
+                            '',
+                            '',
+                            a[0],
+                            '',
+                            ''
+                        ).wrap(this.delimiter)
+                    ))
+                })
+                this.addActions(actions, GROUPS.nemAbilities)
+            }
 
             //techs
             let listTechs = this.actor.items.filter(i => i.type === 'kiTechnique')
@@ -926,6 +938,7 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
 
             let system = this.actor.system
 
+            /*
             let accu = [
                 new ActionData(
                     game.i18n.localize('abfalter.half'),
@@ -950,8 +963,10 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
                 ]
             
             //TODO setting accu
-            if(null)
+            if(game.settings.get(MODULEID, Settings.showAccuMagic))
                 this.addActions(accu, GROUPS.magicAcc)
+
+            */
 
             let def
             if(system.toggles.magicDefModule)
@@ -963,9 +978,12 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
 
             //TODO maybe
             //setting for short or long off/def
+
+            let setShort = game.settings.get(MODULEID, Settings.shortMagicProj)
+
             let proj = [
                 new ActionData(
-                    game.i18n.localize('abfalter.offensive1'),
+                    game.i18n.localize(`abfalter.offensive${(setShort ? '' : '1')}`),
                     'mprojoff',
                     new EncodedValue (
                         ACTION_TYPE_ID[5],
@@ -974,7 +992,7 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
                         system.toggles.magicAtkModule ? system.mproj.atkModule : system.mproj.finalOffensive,
                         '').wrap(this.delimiter)),
                 new ActionData(
-                    game.i18n.localize('abfalter.defensive1'),
+                    game.i18n.localize(`abfalter.defensive${(setShort ? '' : '1')}`),
                     'mprojdef',
                     new EncodedValue (
                         ACTION_TYPE_ID[5],
@@ -1505,7 +1523,71 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
         }
 
         registerSettings (onChangeFunc){
-            //game.settings.register()
+            let settingPath = 'tokenActionHud.abfalter.settings.'
+
+            game.settings.register(MODULEID, Settings.weaponImage, {
+                name: game.i18n.localize(settingPath + 'weaponImageName'),
+                hint: game.i18n.localize(settingPath + 'weaponImageHint'),
+                scope: 'client',
+                config: true,
+                type: Boolean,
+                default: true,
+                onChange: (value) => { onChangeFunc(value) }
+            })
+            game.settings.register(MODULEID, Settings.weaponBreakAction, {
+                name: game.i18n.localize(settingPath + 'weaponBreakActionName'),
+                hint: game.i18n.localize(settingPath + 'weaponBreakActionHint'),
+                scope: 'client',
+                config: true,
+                type: Boolean,
+                default: false,
+                onChange: (value) => { onChangeFunc(value) }
+            })
+            game.settings.register(MODULEID, Settings.weaponForceUnarmed, {
+                name: game.i18n.localize(settingPath + 'weaponForceUnarmedName'),
+                hint: game.i18n.localize(settingPath + 'weaponForceUnarmedHint'),
+                scope: 'client',
+                config: true,
+                type: Boolean,
+                default: false,
+                onChange: (value) => { onChangeFunc(value) }
+            })
+            game.settings.register(MODULEID, Settings.shortMagicProj, {
+                name: game.i18n.localize(settingPath + 'shortMagicProjName'),
+                hint: game.i18n.localize(settingPath + 'shortMagicProjHint'),
+                scope: 'client',
+                config: true,
+                type: Boolean,
+                default: false,
+                onChange: (value) => { onChangeFunc(value) }
+            })
+            game.settings.register(MODULEID, Settings.showAccuKi, {
+                name: game.i18n.localize(settingPath + 'showAccuKiName'),
+                hint: game.i18n.localize(settingPath + 'showAccuKiHint'),
+                scope: 'client',
+                config: true,
+                type: Boolean,
+                default: false,
+                onChange: (value) => { onChangeFunc(value) }
+            })
+            game.settings.register(MODULEID, Settings.showKiAbility, {
+                name: game.i18n.localize(settingPath + 'showKiAbilityName'),
+                hint: game.i18n.localize(settingPath + 'showKiAbilityHint'),
+                scope: 'client',
+                config: true,
+                type: Boolean,
+                default: false,
+                onChange: (value) => { onChangeFunc(value) }
+            })
+            game.settings.register(MODULEID, Settings.showAccuMagic, {
+                name: game.i18n.localize(settingPath + 'showAccuMagicName'),
+                hint: game.i18n.localize(settingPath + 'showAccuMagicHint'),
+                scope: 'client',
+                config: true,
+                type: Boolean,
+                default: false,
+                onChange: (value) => { onChangeFunc(value) }
+            })
         }
 
         /**
