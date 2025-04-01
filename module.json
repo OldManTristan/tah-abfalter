@@ -4,11 +4,16 @@
   "description": "",
   "authors": [
     {
-      "name": "a",
-      "url": "a"
+      "name": "Larkinabout",
+      "url": "https://github.com/Larkinabout"
+    },
+    {
+      "name": "OldMandTristan",
+      "url": "https://github.com/OldManTristan"
     }
   ],
-  "version": "0.1",
+  "url": "auto replaced",
+  "version": "auto replaced",
   "compatibility": {
     "minimum": "12",
     "verified": "12.331"
@@ -57,5 +62,7 @@
     "flags": {
       "optional": []
     }
-  }
+  },
+  "manifest": "This is auto replaced",
+  "download": "This is auto replaced"
 }
