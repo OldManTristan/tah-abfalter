@@ -976,9 +976,6 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
             else
                 def = system.mproj.finalDefensive
 
-            //TODO maybe
-            //setting for short or long off/def
-
             let setShort = game.settings.get(MODULEID, Settings.shortMagicProj)
 
             let proj = [
@@ -1043,107 +1040,108 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
 
             spellList.forEach(s => {
                 switch(s.system.path.toLowerCase()){
-                    case game.i18n.localize('tokenActionHud.abfalter.mpath.light').toLowerCase():
+                    //spell path will be hard coded until I find a way to get a localize in a specifi language
+                    case "Light".toLowerCase():
                         paths.light.push(s)
                         break;
                     
-                    case game.i18n.localize('tokenActionHud.abfalter.mpath.darkness').toLowerCase():
+                    case "Darkness".toLowerCase():
                         paths.darkness.push(s)
                         break;
                             
-                    case game.i18n.localize('tokenActionHud.abfalter.mpath.creation').toLowerCase():
+                    case "Creation".toLowerCase():
                         paths.creation.push(s)
                         break;
                         
-                    case game.i18n.localize('tokenActionHud.abfalter.mpath.destruction').toLowerCase():
+                    case "Destruction".toLowerCase():
                         paths.destruction.push(s)
                         break;
                         
-                    case game.i18n.localize('tokenActionHud.abfalter.mpath.air').toLowerCase():
+                    case "Air".toLowerCase():
                         paths.air.push(s)
                         break;
                         
-                    case game.i18n.localize('tokenActionHud.abfalter.mpath.water').toLowerCase():
+                    case "Water".toLowerCase():
                         paths.water.push(s)
                         break;
                         
-                    case game.i18n.localize('tokenActionHud.abfalter.mpath.fire').toLowerCase():
+                    case "Fire".toLowerCase():
                         paths.fire.push(s)
                         break;
                         
-                    case game.i18n.localize('tokenActionHud.abfalter.mpath.earth').toLowerCase():
+                    case "Earth".toLowerCase():
                         paths.earth.push(s)
                         break;
                         
-                    case game.i18n.localize('tokenActionHud.abfalter.mpath.essence').toLowerCase():
+                    case "Essence".toLowerCase():
                         paths.essence.push(s)
                         break;
                         
-                    case game.i18n.localize('tokenActionHud.abfalter.mpath.illusion').toLowerCase():
+                    case "Illusion".toLowerCase():
                         paths.illusion.push(s)
                         break;
                         
-                    case game.i18n.localize('tokenActionHud.abfalter.mpath.necromancy').toLowerCase():
+                    case "Necromancy".toLowerCase():
                         paths.necromancy.push(s)
                         break;
                         
-                    case game.i18n.localize('tokenActionHud.abfalter.mpath.free').toLowerCase():
+                    case "Free-Access".toLowerCase():
                         paths.free.push(s)
                         break;
                         
-                    case game.i18n.localize('tokenActionHud.abfalter.mpath.chaos').toLowerCase():
+                    case "Chaos".toLowerCase():
                         paths.chaos.push(s)
                         break;
                         
-                    case game.i18n.localize('tokenActionHud.abfalter.mpath.knowledge').toLowerCase():
+                    case "Knowledge".toLowerCase():
                         paths.knowledge.push(s)
                         break;
                         
-                    case game.i18n.localize('tokenActionHud.abfalter.mpath.war').toLowerCase():
+                    case "War".toLowerCase():
                         paths.war.push(s)
                         break;
                         
-                    case game.i18n.localize('tokenActionHud.abfalter.mpath.literature').toLowerCase():
+                    case "Literature".toLowerCase():
                         paths.literature.push(s)
                         break;
                         
-                    case game.i18n.localize('tokenActionHud.abfalter.mpath.death').toLowerCase():
+                    case "Death".toLowerCase():
                         paths.death.push(s)
                         break;
                         
-                    case game.i18n.localize('tokenActionHud.abfalter.mpath.music').toLowerCase():
+                    case "Music".toLowerCase():
                         paths.music.push(s)
                         break;
                         
-                    case game.i18n.localize('tokenActionHud.abfalter.mpath.nobility').toLowerCase():
+                    case "Nobility".toLowerCase():
                         paths.nobility.push(s)
                         break;
                         
-                    case game.i18n.localize('tokenActionHud.abfalter.mpath.peace').toLowerCase():
+                    case "Peace".toLowerCase():
                         paths.peace.push(s)
                         break;
                         
-                    case game.i18n.localize('tokenActionHud.abfalter.mpath.blood').toLowerCase():
+                    case "Blood".toLowerCase():
                         paths.blood.push(s)
                         break;
                     
-                    case game.i18n.localize('tokenActionHud.abfalter.mpath.umbra').toLowerCase():
+                    case "Umbra".toLowerCase():
                         paths.umbra.push(s)
                         break;
                 
-                    case game.i18n.localize('tokenActionHud.abfalter.mpath.dreams').toLowerCase():
+                    case "Dreams".toLowerCase():
                         paths.dreams.push(s)
                         break;
             
-                    case game.i18n.localize('tokenActionHud.abfalter.mpath.sin').toLowerCase():
+                    case "Sin".toLowerCase():
                         paths.sin.push(s)
                         break;
             
-                    case game.i18n.localize('tokenActionHud.abfalter.mpath.time').toLowerCase():
+                    case "Time".toLowerCase():
                         paths.time.push(s)
                         break;
         
-                    case game.i18n.localize('tokenActionHud.abfalter.mpath.void').toLowerCase():
+                    case "Void".toLowerCase():
                         paths._void.push(s)
                         break;
     
@@ -1161,144 +1159,145 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
                     spells.push(
                         new ActionData(
                             s.name,
-                            `spell_${s._id}`,
+                            `spell_${s._id}_${s.system.path}`,
                             new EncodedValue (
                                 ACTION_TYPE_ID[6],
-                                s.system.path,
+                                game.i18n.localize('tokenActionHUD.abfalter.mpath.' + s.system.path.toLowerCase()),
                                 s.name,
                                 '',
                                 s._id).wrap(this.delimiter)
                             ))
                 })
                 if(spells.length < 1) return
-                let temp = EncodedValue.unwrap(spells[0].encodedValue, this.delimiter)
-                switch(temp.actionType.toLowerCase()){
-                    case game.i18n.localize('tokenActionHud.abfalter.mpath.light').toLowerCase():
+                let temp = spells[0].id.split('_')[2]
+                switch(temp.toLowerCase()){
+                    //still hardcoded
+                    case "Light".toLowerCase():
                         this.addGroup(GROUPS.pathLight, GROUPS.spellBook)
                         this.addActions(spells, GROUPS.pathLight)
                         break;
                     
-                    case game.i18n.localize('tokenActionHud.abfalter.mpath.darkness').toLowerCase():
+                    case "Darkness".toLowerCase():
                         this.addGroup(GROUPS.pathDark, GROUPS.spellBook)
                         this.addActions(spells, GROUPS.pathDark)
                         break;
                             
-                    case game.i18n.localize('tokenActionHud.abfalter.mpath.creation').toLowerCase():
+                    case "Creation".toLowerCase():
                         this.addGroup(GROUPS.pathCrea, GROUPS.spellBook)
                         this.addActions(spells, GROUPS.pathCrea)
                         break;
                         
-                    case game.i18n.localize('tokenActionHud.abfalter.mpath.destruction').toLowerCase():
+                    case "Destruction".toLowerCase():
                         this.addGroup(GROUPS.pathDest, GROUPS.spellBook)
                         this.addActions(spells, GROUPS.pathDest)
                         break;
                         
-                    case game.i18n.localize('tokenActionHud.abfalter.mpath.air').toLowerCase():
+                    case "Air".toLowerCase():
                         this.addGroup(GROUPS.pathAir, GROUPS.spellBook)
                         this.addActions(spells, GROUPS.pathAir)
                         break;
                         
-                    case game.i18n.localize('tokenActionHud.abfalter.mpath.water').toLowerCase():
+                    case "Water".toLowerCase():
                         this.addGroup(GROUPS.pathWater, GROUPS.spellBook)
                         this.addActions(spells, GROUPS.pathWater)
                         break;
                         
-                    case game.i18n.localize('tokenActionHud.abfalter.mpath.fire').toLowerCase():
+                    case "Fire".toLowerCase():
                         this.addGroup(GROUPS.pathFire, GROUPS.spellBook)
                         this.addActions(spells, GROUPS.pathFire)
                         break;
                         
-                    case game.i18n.localize('tokenActionHud.abfalter.mpath.earth').toLowerCase():
+                    case "Earth".toLowerCase():
                         this.addGroup(GROUPS.pathEarth, GROUPS.spellBook)
                         this.addActions(spells, GROUPS.pathEarth)
                         break;
                         
-                    case game.i18n.localize('tokenActionHud.abfalter.mpath.essence').toLowerCase():
+                    case "Essence".toLowerCase():
                         this.addGroup(GROUPS.pathEss, GROUPS.spellBook)
                         this.addActions(spells, GROUPS.pathEss)
                         break;
                         
-                    case game.i18n.localize('tokenActionHud.abfalter.mpath.illusion').toLowerCase():
+                    case "Illusion".toLowerCase():
                         this.addGroup(GROUPS.pathIll, GROUPS.spellBook)
                         this.addActions(spells, GROUPS.pathIll)
                         break;
                         
-                    case game.i18n.localize('tokenActionHud.abfalter.mpath.necromancy').toLowerCase():
+                    case "Necromancy".toLowerCase():
                         this.addGroup(GROUPS.pathNec, GROUPS.spellBook)
                         this.addActions(spells, GROUPS.pathNec)
                         break;
                         
-                    case game.i18n.localize('tokenActionHud.abfalter.mpath.free').toLowerCase():
+                    case "Free-Access".toLowerCase():
                         this.addGroup(GROUPS.pathFree, GROUPS.spellBook)
                         this.addActions(spells, GROUPS.pathFree)
                         break;
                         
-                    case game.i18n.localize('tokenActionHud.abfalter.mpath.chaos').toLowerCase():
+                    case "Chaos".toLowerCase():
                         this.addGroup(GROUPS.pathChaos, GROUPS.spellBook)
                         this.addActions(spells, GROUPS.pathChaos)
                         break;
                         
-                    case game.i18n.localize('tokenActionHud.abfalter.mpath.knowledge').toLowerCase():
+                    case "Knowledge".toLowerCase():
                         this.addGroup(GROUPS.pathKnow, GROUPS.spellBook)
                         this.addActions(spells, GROUPS.pathKnow)
                         break;
                         
-                    case game.i18n.localize('tokenActionHud.abfalter.mpath.war').toLowerCase():
+                    case "War".toLowerCase():
                         this.addGroup(GROUPS.pathWar, GROUPS.spellBook)
                         this.addActions(spells, GROUPS.pathWar)
                         break;
                         
-                    case game.i18n.localize('tokenActionHud.abfalter.mpath.literature').toLowerCase():
+                    case "Literature".toLowerCase():
                         this.addGroup(GROUPS.pathLit, GROUPS.spellBook)
                         this.addActions(spells, GROUPS.pathLit)
                         break;
                         
-                    case game.i18n.localize('tokenActionHud.abfalter.mpath.death').toLowerCase():
+                    case "Death".toLowerCase():
                         this.addGroup(GROUPS.pathDeath, GROUPS.spellBook)
                         this.addActions(spells, GROUPS.pathDeath)
                         break;
                         
-                    case game.i18n.localize('tokenActionHud.abfalter.mpath.music').toLowerCase():
+                    case "Music".toLowerCase():
                         this.addGroup(GROUPS.pathMusic, GROUPS.spellBook)
                         this.addActions(spells, GROUPS.pathMusic)
                         break;
                         
-                    case game.i18n.localize('tokenActionHud.abfalter.mpath.nobility').toLowerCase():
+                    case "Nobility".toLowerCase():
                         this.addGroup(GROUPS.pathNob, GROUPS.spellBook)
                         this.addActions(spells, GROUPS.pathNob)
                         break;
                         
-                    case game.i18n.localize('tokenActionHud.abfalter.mpath.peace').toLowerCase():
+                    case "Peace".toLowerCase():
                         this.addGroup(GROUPS.pathPeace, GROUPS.spellBook)
                         this.addActions(spells, GROUPS.pathPeace)
                         break;
                         
-                    case game.i18n.localize('tokenActionHud.abfalter.mpath.blood').toLowerCase():
+                    case "Blood".toLowerCase():
                         this.addGroup(GROUPS.pathBlood, GROUPS.spellBook)
                         this.addActions(spells, GROUPS.pathBlood)
                         break;
                     
-                    case game.i18n.localize('tokenActionHud.abfalter.mpath.umbra').toLowerCase():
+                    case "Umbra".toLowerCase():
                         this.addGroup(GROUPS.pathUmbra, GROUPS.spellBook)
                         this.addActions(spells, GROUPS.pathUmbra)
                         break;
                 
-                    case game.i18n.localize('tokenActionHud.abfalter.mpath.dreams').toLowerCase():
+                    case "Dreams".toLowerCase():
                         this.addGroup(GROUPS.pathDream, GROUPS.spellBook)
                         this.addActions(spells, GROUPS.pathDream)
                         break;
 
-                    case game.i18n.localize('tokenActionHud.abfalter.mpath.sin').toLowerCase():
+                    case "Sin".toLowerCase():
                         this.addGroup(GROUPS.pathSin, GROUPS.spellBook)
                         this.addActions(spells, GROUPS.pathSin)
                         break;
             
-                    case game.i18n.localize('tokenActionHud.abfalter.mpath.time').toLowerCase():
+                    case "Time".toLowerCase():
                         this.addGroup(GROUPS.pathTime, GROUPS.spellBook)
                         this.addActions(spells, GROUPS.pathTime)
                         break;
         
-                    case game.i18n.localize('tokenActionHud.abfalter.mpath.void').toLowerCase():
+                    case "Void".toLowerCase():
                         this.addGroup(GROUPS.pathVoid, GROUPS.spellBook)
                         this.addActions(spells, GROUPS.pathVoid)
                         break;
