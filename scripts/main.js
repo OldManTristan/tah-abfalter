@@ -26,6 +26,8 @@ export const ACTION_TYPE_ID = [
     'kiaccuhalf',
     'maccu',
     'maccuhalf',
+    'potential',
+    'psyProj'
 ]
 export class EncodedValue {
 
@@ -41,7 +43,7 @@ export class EncodedValue {
         this.name = name
         this.id = id
 
-        if(Object.hasOwn(roll, 'length'))
+        if(Array.isArray(roll))
             this.roll = roll.split(',')
         else
             this.roll = roll
@@ -73,6 +75,9 @@ export class EncodedValue {
      * @returns {EncodedValue}
      */
     fromRollIndex(index){
+        if(!Array.isArray(this.roll))
+            return new EncodedValue(this.actionTypeId, this.actionType, this.name, this.roll, this.id)
+
         return new EncodedValue(this.actionTypeId, this.actionType, this.name, this.roll[index], this.id)
     }
 
@@ -87,6 +92,24 @@ export class EncodedValue {
         return EncodedValue.unwrap(original, delimiter).fromRollIndex(index)
     }
 }
+export class ActionData {
+    name
+    id
+    encodedValue
+
+    /**
+     * 
+     * @param {string} name 
+     * @param {string} id 
+     * @param {EncodedValue} encodedValue 
+     */
+    constructor(name, id, encodedValue){
+        this.name = name
+        this.id = id
+        this.encodedValue = encodedValue
+    }
+}
+
 export const GROUPS = {
     //#region Combat
     combat: { id: 'combat', nestId: 'combat', name: 'tokenActionHud.abfalter.tabs.combat', type: 'system' },
@@ -166,6 +189,13 @@ export const GROUPS = {
 
     //#region Psy
     psy: { id: 'psy', name: 'abfalter.psychic', type: 'system' },
+
+    psyPotential: { id: 'potential', nestId: 'psy_potential', name: 'abfalter.psychicPotential', type: 'system', settings:{showTitle : false} },
+    
+    psyProj: { id: 'psyproj', nestId: 'psy_psyproj', name: 'abfalter.pproj', type: 'system', settings:{showTitle : false} },
+    
+    matrix: { id: 'matrix', nestId: 'psy_matrix', name: 'abfalter.psychicMatrices', type: 'system' },
+
     //#endregion
 
     //#region Inventory
@@ -210,8 +240,8 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
                 this.#BuildKi()
                 this.#BuildMagic()
                 this.#BuildPsy()
-                this.#BuildInventory()
-                this.#BuildEffect()
+                //this.#BuildInventory()
+                //this.#BuildEffect()
             }
 
         }
@@ -237,17 +267,15 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
                     game.i18n.localize('tokenActionHud.abfalter.unequip') + w.name :
                     game.i18n.localize('tokenActionHud.abfalter.equip') + w.name
                 
-                this.addActions([{
-                    name : label,
-                    id: `equip_${w.name}`,
-                    encodedValue: new EncodedValue(
+                this.addActions([
+                    new ActionData (label, `equip_${w.name}`, new EncodedValue(
                         ACTION_TYPE_ID[2],
                         '',
                         w.name,
                         '',
                         w._id
-                    ).wrap(this.delimiter)
-                }], groupInit)
+                    ).wrap(this.delimiter))
+                ], groupInit)
             
                 //#endregion
 
@@ -363,58 +391,57 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
             })
 
 
-            let actionAtk = {
-                name : game.i18n.localize('abfalter.attack'),
-                id: `atk${label}`,
-                encodedValue: new EncodedValue(
-                    ACTION_TYPE_ID[(!!w ? 4 : 5)],
-                    ACTION_TYPE[(!!w ? 5 : 4)],
-                    (!!w ? w.name : 'attack'),
-                    (!!w ? '' : atkValues.toString()),
+            let actionAtk = new ActionData(
+                game.i18n.localize('abfalter.attack'),
+                `atk${label}`,
+                new EncodedValue(
+                    ACTION_TYPE_ID[(w ? 4 : 5)],
+                    ACTION_TYPE[(w ? 5 : 4)],
+                    (w ? w.name : 'attack'),
+                    (w ? '' : atkValues.toString()),
                     id
-                ).wrap(this.delimiter)
-            }
+                ).wrap(this.delimiter))
+            
 
-            let actionBlock = {
-                name : game.i18n.localize('abfalter.block'),
-                id: `block${label}`,
-                encodedValue: new EncodedValue(
+            let actionBlock = new ActionData(
+                game.i18n.localize('abfalter.block'),
+                `block${label}`,
+                new EncodedValue(
                     ACTION_TYPE_ID[5],
                     ACTION_TYPE[(!!w ? 6 : 4)],
-                    (!!w ? w.name : 'block'),
-                    (!!w ? '' : blockValues.toString()),
+                    (w ? w.name : 'block'),
+                    (w ? '' : blockValues.toString()),
                     id
                 ).wrap(this.delimiter)
-            }
+            )
 
-            let actionDodge = {
-                name : game.i18n.localize('abfalter.dodge'),
-                id: `dodge${label}`,
-                encodedValue: new EncodedValue(
+            let actionDodge = new ActionData (
+                game.i18n.localize('abfalter.dodge'),
+                `dodge${label}`,
+                new EncodedValue(
                     ACTION_TYPE_ID[5],
                     ACTION_TYPE[(!!w ? 6 : 4)],
-                    (!!w ? w.name : 'dodge'),
-                    (!!w ? '' : dodgeValues.toString()),
+                    (w ? w.name : 'dodge'),
+                    (w ? '' : dodgeValues.toString()),
                     id
                 ).wrap(this.delimiter)
-            }
+            )
 
             _return.actions.push(actionAtk, actionBlock, actionDodge)
-
             
             //break
-            if(!!w){
-                let actionBreak = {
-                    name : `${game.i18n.localize('abfalter.breakageShort')}`,
-                    id: `break${w.name}`,
-                    encodedValue: new EncodedValue(
+            if(w){
+                let actionBreak = new ActionData (
+                    game.i18n.localize('abfalter.breakageShort'),
+                    `break${w.name}`,
+                    new EncodedValue(
                         ACTION_TYPE_ID[4],
                         ACTION_TYPE[7],
                         w.name,
                         '',
                         w._id
                     ).wrap(this.delimiter)
-                }
+                )
                 _return.break.push(actionBreak)
             }
 
@@ -462,17 +489,16 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
                 let name = ab.type === 'custom' ? ab.label : game.i18n.localize(`abfalter.${ab.label}`)
                 let custLabel = ab.type === 'custom' ? ab.label.replaceAll(' ', '').toLowerCase() : ab.label
 
-                let data = {
-                    name: name,
-                    id: `ability_${custLabel}`,
-                    encodedValue: new EncodedValue (
+                let data = new ActionData(
+                    name,
+                    `ability_${custLabel}`,
+                    new EncodedValue (
                         ACTION_TYPE_ID[0],
                         ACTION_TYPE[1],
                         custLabel,
                         ab.final,
                         ''
-                    ).wrap(this.delimiter)
-                }
+                    ).wrap(this.delimiter))
 
                 switch(ab.label){
                     case 'acrobatic':
@@ -607,17 +633,16 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
                         }))
                 })
 
-                let data = {
-                    name: name,
-                    id: `ability_${custLabel}`,
-                    encodedValue: new EncodedValue (
+                let data = new ActionData(
+                    name,
+                    `ability_${custLabel}`,
+                    new EncodedValue (
                         ACTION_TYPE_ID[0],
                         ACTION_TYPE[1],
                         custLabel,
                         values.toString(),
                         ''
-                    ).wrap(this.delimiter)
-                }
+                    ).wrap(this.delimiter))
 
                 switch(ab.label){
                     case 'acrobatic':
@@ -754,16 +779,16 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
             this.addGroup(GROUPS.resistanceGroup, GROUPS.resistances)
 
             res.forEach(r => {
-                this.addActions([{
-                    id: `${GROUPS.resistances.id}_${r.name}`,
-                    name: r.name,
-                    encodedValue: new EncodedValue (
+                this.addActions([ new ActionData(
+                    r.name,
+                    `${GROUPS.resistances.id}_${r.name}`,
+                    new EncodedValue (
                         ACTION_TYPE_ID[3],
                         ACTION_TYPE[6],
                         r.name,
                         r.final,
                         '').wrap(this.delimiter)
-                }], GROUPS.resistanceGroup)
+                )], GROUPS.resistanceGroup)
             })
         }
 
@@ -814,25 +839,24 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
 
             Object.values(res).forEach(r => {
 
-                this.addActions([{
-                    id: `${GROUPS.resistances.id}_${r.res.name}`,
-                    name: r.res.name,
-                    encodedValue: new EncodedValue (
+                this.addActions([new ActionData(
+                    r.res.name,
+                    `${GROUPS.resistances.id}_${r.res.name}`,
+                    new EncodedValue (
                         ACTION_TYPE_ID[3],
                         ACTION_TYPE[6],
                         r.res.name,
                         r.values.toString(),
                         '').wrap(this.delimiter)
-                }], GROUPS.resistanceGroup)
+                )], GROUPS.resistanceGroup)
             })
         }
 
         #BuildKi(){
-            if(this.multiple) return;
             if(this.actor.system.toggles.kiTab)
                 return;
+            
 
-            this.addGroup(GROUPS.kiGroup, GROUPS.ki)
 
         }
 
@@ -841,26 +865,28 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
 
             let system = this.actor.system
 
-            let accu = [{
-                id: 'maccuhalf',
-                name: game.i18n.localize('abfalter.half'),
-                encodedValue: new EncodedValue (
-                    ACTION_TYPE_ID[10],
-                    '',
+            let accu = [
+                new ActionData(
                     game.i18n.localize('abfalter.half'),
-                    '',
-                    '').wrap(this.delimiter)
-            },
-            {
-                id: 'maccufull',
-                name: game.i18n.localize('abfalter.full'),
-                encodedValue: new EncodedValue (
-                    ACTION_TYPE_ID[9],
-                    '',
+                    'maccuhalf',
+                    new EncodedValue (
+                        ACTION_TYPE_ID[10],
+                        '',
+                        game.i18n.localize('abfalter.half'),
+                        '',
+                        '').wrap(this.delimiter)
+                ),
+                new ActionData(
                     game.i18n.localize('abfalter.full'),
-                    '',
-                    '').wrap(this.delimiter)
-            }]
+                    'maccufull',
+                    new EncodedValue (
+                        ACTION_TYPE_ID[9],
+                        '',
+                        game.i18n.localize('abfalter.full'),
+                        '',
+                        '').wrap(this.delimiter)
+                    )
+                ]
             
             //TODO setting accu
             if(null)
@@ -876,25 +902,26 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
 
             //TODO maybe
             //setting for short or long off/def
-            let proj = [{
-                id: 'mprojoff',
-                name: game.i18n.localize('abfalter.offensive1'),
-                encodedValue: new EncodedValue (
-                    ACTION_TYPE_ID[5],
-                    ACTION_TYPE[5],
-                    game.i18n.localize('abfalter.offMagicProj'),
-                    system.toggles.magicAtkModule ? system.mproj.atkModule : system.mproj.finalOffensive,
-                    '').wrap(this.delimiter)
-            },{
-                id: 'mprojdef',
-                name: game.i18n.localize('abfalter.defensive1'),
-                encodedValue: new EncodedValue (
-                    ACTION_TYPE_ID[5],
-                    ACTION_TYPE[5],
-                    game.i18n.localize('abfalter.defMagicProj'),
-                    def,
-                    '').wrap(this.delimiter)
-            }]
+            let proj = [
+                new ActionData(
+                    game.i18n.localize('abfalter.offensive1'),
+                    'mprojoff',
+                    new EncodedValue (
+                        ACTION_TYPE_ID[5],
+                        ACTION_TYPE[5],
+                        game.i18n.localize('abfalter.offMagicProj'),
+                        system.toggles.magicAtkModule ? system.mproj.atkModule : system.mproj.finalOffensive,
+                        '').wrap(this.delimiter)),
+                new ActionData(
+                    game.i18n.localize('abfalter.defensive1'),
+                    'mprojdef',
+                    new EncodedValue (
+                        ACTION_TYPE_ID[5],
+                        ACTION_TYPE[5],
+                        game.i18n.localize('abfalter.defMagicProj'),
+                        def,
+                        '').wrap(this.delimiter))
+            ]
 
             this.addActions(proj, GROUPS.magicProj)
 
@@ -1052,16 +1079,17 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
                 p.sort(this.#sortSpellsASC)
                 let spells = []
                 p.forEach(s => {
-                    spells.push({
-                        id: `spell_${s._id}`,
-                        name: s.name,
-                        encodedValue: new EncodedValue (
-                            ACTION_TYPE_ID[6],
-                            s.system.path,
+                    spells.push(
+                        new ActionData(
                             s.name,
-                            '',
-                            s._id).wrap(this.delimiter)
-                    })
+                            `spell_${s._id}`,
+                            new EncodedValue (
+                                ACTION_TYPE_ID[6],
+                                s.system.path,
+                                s.name,
+                                '',
+                                s._id).wrap(this.delimiter)
+                            ))
                 })
                 if(spells.length < 1) return
                 let temp = EncodedValue.unwrap(spells[0].encodedValue, this.delimiter)
@@ -1216,12 +1244,61 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
             if(this.actor.system.toggles.psychicTab) return;
 
             //potential
-            //combatroll
+            this.addActions([
+                new ActionData(
+                    game.i18n.localize('abfalter.ppotential'),
+                    'ppot',
+                    new EncodedValue(
+                        ACTION_TYPE_ID[11],
+                        ACTION_TYPE[2],
+                        'psychicPotential',
+                        this.actor.system.ppotential.final,
+                        ''
+                    ).wrap(this.delimiter))
+            ], GROUPS.psyPotential)
 
             //proj
-            //attackroll
+            this.addActions([
+                new ActionData(
+                    game.i18n.localize('abfalter.pproj'),
+                    'pproj',
+                    new EncodedValue(
+                        ACTION_TYPE_ID[12],
+                        ACTION_TYPE[4],
+                        'psyProj',
+                        this.actor.system.pproj.final,
+                        ''
+                    ).wrap(this.delimiter))
+            ], GROUPS.psyProj)
 
             //matrices
+            let listMat = this.actor.items.filter(i => i.type === 'psychicMatrix')
+
+            listMat.sort(this.#SortMatrixASC)
+
+            let actionMat = []
+
+            listMat.forEach(m => {
+                actionMat.push(new ActionData(
+                    m.name,
+                    `matrix${m._id}`,
+                    new EncodedValue(
+                        ACTION_TYPE_ID[6],
+                        '',
+                        m.name,
+                        '',
+                        m._id).wrap(this.delimiter)
+                ))
+            })
+
+            this.addActions(actionMat, GROUPS.matrix)
+        }
+
+        /**
+         * Algorithm to sort matrices by ascending level
+         */
+        #SortMatrixASC(a, b){
+            return a.system.level - b.system.level
         }
 
         #BuildInventory(){
@@ -1286,6 +1363,7 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
 
                 case ACTION_TYPE_ID[0]: //ability
                 case ACTION_TYPE_ID[3]: //res
+                case ACTION_TYPE_ID[11]: //potential
                     actor.sheet._onRoll(juryriggedEvent)
                     break;
 
@@ -1313,6 +1391,7 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
                     break;
 
                 case ACTION_TYPE_ID[5]: //combat
+                case ACTION_TYPE_ID[12]: //psyProj
                     actor.sheet._onAttackRoll(juryriggedEvent)
                     break;
 
@@ -1421,6 +1500,15 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
                             { ...groups.magicAcc },
                             { ...groups.magicProj },
                             { ...groups.spellBook }
+                        ]
+                    },
+                    {
+                        ...groups.psy,
+                        nestId: groups.psy.id,
+                        groups: [
+                            { ...groups.psyPotential },
+                            { ...groups.psyProj },
+                            { ...groups.matrix }
                         ]
                     }
                 ],
