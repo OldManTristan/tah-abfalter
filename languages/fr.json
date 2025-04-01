@@ -1,0 +1,72 @@
+{
+  "tokenActionHud": {
+    "abfalter": {
+      "abillityGroup":{
+        "fav": "Favoris",
+        "ath": "Athlétique",
+        "crea": "Créatif",
+        "int": "Intellectuel",
+        "sub": "Clandestin",
+        "soc": "Social",
+        "vig": "Vital",
+        "per": "Sensoriel",
+        "cust": "Personnalisé"
+      },
+      "equip":"Équiper: ",
+      "equipw" : "Équipement d'arme",
+      "mpath" : {
+        "light": "Lumière",
+        "darkness": "Obscurité",
+        "creation": "Création",
+        "destruction": "Destruction",
+        "air": "Air",
+        "water": "Eau",
+        "fire": "Feu",
+        "earth": "Terre",
+        "essence": "Essence",
+        "illusion": "Illusion",
+        "necromancy": "Nécromancie",
+        "free": "Free-Access",
+        "chaos": "Chaos",
+        "knowledge": "Connaissance",
+        "war": "Guerre",
+        "literature": "Literae",
+        "death": "Mort",
+        "music": "Musique",
+        "nobility": "Noblesse",
+        "peace": "Paix",
+        "sin": "Péché",
+        "blood": "Sang",
+        "umbra": "Seuil",
+        "dreams": "Songes",
+        "time": "Temps",
+        "void": "Vide",
+        "custom": "Custom"
+      },
+      "nemesis": "Némésis",
+      "nemabs": "Pouvoir Némésis",
+      "rinit" : "Lancer l'Initiative",
+      "settings": {
+        "weaponImageName": "Afficher image d'arme",
+        "weaponImageHint": "Afficher l'image de l'arme devant le groupe d'action de celle-ci.",
+        "weaponBreakActionName": "Afficher l'action Fracassement",
+        "weaponBreakActionHint": "Afficher l'action de fracassement avec les actions des armes.",
+        "weaponForceUnarmedName": "Forcer affichage comp. combat de base",
+        "weaponForceUnarmedHint": "Forcer affichage compétences de combat de base même si des armes sont déjà équipées.",
+        "shortMagicProjName": "Raccourcir textes projection magique",
+        "shortMagicProjHint": "Raccourcir les textes des actions de projection magique.",
+        "showAccuKiName": "Afficher accu ki",
+        "showAccuKiHint": "Ne fait rien pour l'instant.",
+        "showKiAbilityName": "Afficher pouvoirs ki/némésis",
+        "showKiAbilityHint": "Afficher les pouvoirs de ki et de némésis, seulement à titre indicatif, les actions ne font rien.",
+        "showAccuMagicName": "Afficher accu magique",
+        "showAccuMagicHint": "Ne fait rien pour l'instant."
+      },
+      "tabs": {
+        "combat": "Combat",
+        "ability": "Capacité"
+      },
+      "unequip": "Déséquiper: "
+    }
+  }
+}

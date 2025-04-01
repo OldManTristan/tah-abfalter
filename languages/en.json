@@ -56,7 +56,7 @@
         "shortMagicProjName": "Short magic projection",
         "shortMagicProjHint": "Shortens magic projection action name.",
         "showAccuKiName": "Show ki accu actions",
-        "showAccuKiHint": "not implemented yet",
+        "showAccuKiHint": "not implemented yet.",
         "showKiAbilityName": "Show Ki & Nemesis abilities",
         "showKiAbilityHint": "It is only for info purposes, actions will do nothing.",
         "showAccuMagicName": "Show Magic accu actions",
