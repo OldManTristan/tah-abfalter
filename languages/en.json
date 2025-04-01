@@ -43,7 +43,8 @@
         "void": "Void",
         "custom": "Custom"
       },
-      "nemesis": "nemesis",
+      "nemesis": "Nemesis",
+      "nemabs": "Nemesis Abilities",
       "rinit" : "Roll Initiative",
       "tabs": {
         "combat": "Combat",

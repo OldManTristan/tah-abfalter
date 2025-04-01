@@ -144,10 +144,11 @@ export const GROUPS = {
     //#region Ki
     ki: { id: 'ki', name: 'abfalter.ki', type: 'system' },
 
-    kiGroup: { id: 'kigroup', nestId: 'ki_kigroup', name: 'abfalter.ki', type: 'system' },
-    nemesisGroup: { id: 'nemesis', nestId: 'ki_nemesis', name: 'tokenActionHud.abfalter.nemesis', type: 'system' },
+    kiAbilities: { id: 'kiabs', nestId: 'ki_kiabs', name: 'abfalter.kiTab.kiAbilities', type: 'system' },
 
-    kiAbilities: { id: 'kiabs', nestId: 'ki_kigroup_kiabs', name: 'abfalter.kiTab.kiAbilities', type: 'system' },
+    nemAbilities: { id: 'nemabs', nestId: 'ki_nemabs', name: 'tokenActionHud.abfalter.nemabs', type: 'system' },
+
+    techs : { id: 'kitech', nestId: 'ki_kitech', name: 'abfalter.kiTechnique', type: 'system'},
     //#endregion
 
     //#region Magic
@@ -856,7 +857,67 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
             if(this.actor.system.toggles.kiTab)
                 return;
             
+            let kiAbs = []
+            let nemAbs = []
 
+            Object.entries(this.actor.system.kiAbility).forEach(a => {
+                if(!a[1].status) return
+
+                if(a[0].includes('nemi') || a[0].includes('Nemesis'))
+                    nemAbs.push(a)
+                else
+                    kiAbs.push(a)
+            })
+
+            let actions = []
+            //ki abs
+            kiAbs.forEach(a => {
+                actions.push(new ActionData(
+                    game.i18n.localize(`abfalter.kiTab.${a[0]}`), a[0],
+                    new EncodedValue(
+                        '',
+                        '',
+                        a[0],
+                        '',
+                        ''
+                    ).wrap(this.delimiter)
+                ))
+            })
+            this.addActions(actions, GROUPS.kiAbilities)
+            actions = []
+            //nem abs
+            nemAbs.forEach(a => {
+                actions.push(new ActionData(
+                    game.i18n.localize(`abfalter.kiTab.${a[0]}`), a[0],
+                    new EncodedValue(
+                        '',
+                        '',
+                        a[0],
+                        '',
+                        ''
+                    ).wrap(this.delimiter)
+                ))
+            })
+            this.addActions(actions, GROUPS.nemAbilities)
+
+            //techs
+            let listTechs = this.actor.items.filter(i => i.type === 'kiTechnique')
+
+            let actionTech = []
+
+            listTechs.forEach(t => {
+                actionTech.push(new ActionData(
+                    t.name, t._id, new EncodedValue(
+                        ACTION_TYPE_ID[6],
+                        '',
+                        t.name,
+                        '',
+                        t._id
+                    ).wrap(this.delimiter)
+                ))
+            })
+
+            this.addActions(actionTech, GROUPS.techs)
 
         }
 
@@ -1399,6 +1460,8 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
                     actor.items.get(value.id).roll(value.name)
                     break;
 
+                default:
+                    console.log('nothing yet for that')
             }
         }
     }
@@ -1489,8 +1552,9 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
                         ...groups.ki,
                         nestId: groups.ki.id,
                         groups: [
-                            { ...groups.kiGroup },
-                            { ...groups.nemesisGroup }
+                            { ...groups.techs },
+                            { ...groups.kiAbilities },
+                            { ...groups.nemAbilities }
                         ]
                     },
                     {
