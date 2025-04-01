@@ -6,32 +6,15 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    
     - uses: actions/checkout@v2
-    - name: Update Version
-      shell: bash
-      id: set-version
-      run: echo "::set-output name=version::$(node ./.github/workflows/set-version.js ${{ github.ref }})"
-    - run: zip -r ./tah-abfalter.zip module.json tah-abfalter.js languages/
-    - name: Create Release
-      id: create_versioned_release
-      uses: ncipollo/release-action@v1
-      with:
-        allowUpdates: true
-        name: Release ${{ steps.set-version.outputs.version }}
-        draft: false
-        prerelease: false
-        token: ${{ secrets.GITHUB_TOKEN }}
-        artifacts: './module.json,./tah-abfalter.zip'
     - name: Create Release
       id: create_latest_release
       uses: ncipollo/release-action@v1
-      if: endsWith(github.ref, 'master') # Only update the latest release when pushing to the master branch
       with:
         allowUpdates: true
         name: Latest
         draft: false
-        prerelease: false
+        prerelease: true
         token: ${{ secrets.GITHUB_TOKEN }}
-        artifacts: './module.json,./tah-abfalter.zip'
+        artifacts: './module.json'
         tag: latest
