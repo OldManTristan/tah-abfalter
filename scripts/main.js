@@ -65,7 +65,7 @@ export class EncodedValue {
         else{
             ret += this.roll
             return ret
-        }
+        } 
     }
 
     /**
