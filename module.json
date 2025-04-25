@@ -41,7 +41,7 @@
         "compatibility": [
           {
             "minimum": "1.4.6",
-            "verified": "1.4.6"
+            "verified": "1.4.7"
           }
         ]
       }

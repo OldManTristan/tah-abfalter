@@ -37,16 +37,12 @@ export class EncodedValue {
     roll
     id
 
-    constructor(actionTypeId, actionType, name, roll, id){
+    constructor(actionTypeId, actionType, name, id, roll){
         this.actionTypeId = actionTypeId
         this.actionType = actionType
         this.name = name
         this.id = id
-
-        if(Array.isArray(roll))
-            this.roll = roll.split(',')
-        else
-            this.roll = roll
+        this.roll = roll
     }
 
     /**
@@ -55,7 +51,21 @@ export class EncodedValue {
      * @returns {string}
      */
     wrap(delimiter){
-        return Object.values(this).join(delimiter)
+        let ret = this.actionTypeId + delimiter +
+                  this.actionType + delimiter + 
+                  this.name + delimiter +
+                  this.id + delimiter
+        
+        if(Array.isArray(this.roll)){
+            this.roll.forEach(r => {
+                ret += r + ','
+            })
+            return ret.substring(0, ret.length - 1)
+        }
+        else{
+            ret += this.roll
+            return ret
+        }
     }
 
     /**
@@ -66,7 +76,7 @@ export class EncodedValue {
      */
     static unwrap(encoded, delimiter){
         let _ = encoded.split(delimiter)
-        return new EncodedValue(_[0], _[1], _[2], _[3], _[4])
+        return new EncodedValue(_[0], _[1], _[2], _[3], _[4].split(','))
     }
     
     /**
@@ -75,10 +85,11 @@ export class EncodedValue {
      * @returns {EncodedValue}
      */
     fromRollIndex(index){
-        if(!Array.isArray(this.roll))
-            return new EncodedValue(this.actionTypeId, this.actionType, this.name, this.roll, this.id)
+        if(index > this.roll.length-1)
+            throw new Error("OutOfBounds in EncodedValue.roll");
+            
 
-        return new EncodedValue(this.actionTypeId, this.actionType, this.name, this.roll[index], this.id)
+        return new EncodedValue(this.actionTypeId, this.actionType, this.name, this.id, this.roll[index])
     }
 
     /**
@@ -90,6 +101,14 @@ export class EncodedValue {
      */
     static fromRollIndex(original, delimiter, index){
         return EncodedValue.unwrap(original, delimiter).fromRollIndex(index)
+    }
+
+    /**
+     * Is roll an array of value
+     * @returns {boolean}
+     */
+    isRollArray(){
+        return this.roll.length > 1
     }
 }
 export class ActionData {
@@ -284,8 +303,8 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
                         ACTION_TYPE_ID[2],
                         '',
                         w.name,
-                        '',
-                        w._id
+                        w._id,
+                        ''
                     ).wrap(this.delimiter))
                 ], groupInit)
             
@@ -331,8 +350,8 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
                     ACTION_TYPE_ID[1],
                     '',
                     game.i18n.localize('tokenActionHud.abfalter.rinit'),
-                    '', //no value since we don't need it in actionHandler
-                    ''
+                    '',
+                    '' //no value since we don't need it in actionHandler
                 ).wrap(this.delimiter)
             }], GROUPS.initiative)
         }
@@ -352,8 +371,8 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
                     ACTION_TYPE_ID[1],
                     '',
                     game.i18n.localize('tokenActionHud.abfalter.rinit'),
-                    '', //no value since we don't need it in actionHandler
-                    ''
+                    '',
+                    '' //no value since we don't need it in actionHandler
                 ).wrap(this.delimiter)
             }], GROUPS.initiative)
         }
@@ -407,8 +426,8 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
                     ACTION_TYPE_ID[(w ? 4 : 5)],
                     ACTION_TYPE[(w ? 5 : 4)],
                     (w ? w.name : 'attack'),
-                    (w ? '' : atkValues.toString()),
-                    id
+                    id,
+                    (w ? '' : atkValues)
                 ).wrap(this.delimiter))
             
 
@@ -419,8 +438,8 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
                     ACTION_TYPE_ID[5],
                     ACTION_TYPE[(!!w ? 6 : 4)],
                     (w ? w.name : 'block'),
-                    (w ? '' : blockValues.toString()),
-                    id
+                    id,
+                    (w ? '' : blockValues)
                 ).wrap(this.delimiter)
             )
 
@@ -431,8 +450,8 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
                     ACTION_TYPE_ID[5],
                     ACTION_TYPE[(!!w ? 6 : 4)],
                     (w ? w.name : 'dodge'),
-                    (w ? '' : dodgeValues.toString()),
-                    id
+                    id,
+                    (w ? '' : dodgeValues)
                 ).wrap(this.delimiter)
             )
 
@@ -447,8 +466,8 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
                         ACTION_TYPE_ID[4],
                         ACTION_TYPE[7],
                         w.name,
-                        '',
-                        w._id
+                        w._id,
+                        ''
                     ).wrap(this.delimiter)
                 )
                 _return.break.push(actionBreak)
@@ -505,8 +524,8 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
                         ACTION_TYPE_ID[0],
                         ACTION_TYPE[1],
                         custLabel,
-                        ab.final,
-                        ''
+                        '',
+                        ab.final
                     ).wrap(this.delimiter))
 
                 switch(ab.label){
@@ -649,8 +668,8 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
                         ACTION_TYPE_ID[0],
                         ACTION_TYPE[1],
                         custLabel,
-                        values.toString(),
-                        ''
+                        '',
+                        values.toString()
                     ).wrap(this.delimiter))
 
                 switch(ab.label){
@@ -795,8 +814,8 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
                         ACTION_TYPE_ID[3],
                         ACTION_TYPE[6],
                         r.name,
-                        r.final,
-                        '').wrap(this.delimiter)
+                        '',
+                        r.final).wrap(this.delimiter)
                 )], GROUPS.resistanceGroup)
             })
         }
@@ -855,8 +874,8 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
                         ACTION_TYPE_ID[3],
                         ACTION_TYPE[6],
                         r.res.name,
-                        r.values.toString(),
-                        '').wrap(this.delimiter)
+                        '',
+                        r.values.toString()).wrap(this.delimiter)
                 )], GROUPS.resistanceGroup)
             })
         }
@@ -923,8 +942,8 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
                         ACTION_TYPE_ID[6],
                         '',
                         t.name,
-                        '',
-                        t._id
+                        t._id,
+                        ''
                     ).wrap(this.delimiter)
                 ))
             })
@@ -986,8 +1005,8 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
                         ACTION_TYPE_ID[5],
                         ACTION_TYPE[5],
                         game.i18n.localize('abfalter.offMagicProj'),
-                        system.toggles.magicAtkModule ? system.mproj.atkModule : system.mproj.finalOffensive,
-                        '').wrap(this.delimiter)),
+                        '',
+                        system.toggles.magicAtkModule ? system.mproj.atkModule : system.mproj.finalOffensive).wrap(this.delimiter)),
                 new ActionData(
                     game.i18n.localize(`abfalter.defensive${(setShort ? '' : '1')}`),
                     'mprojdef',
@@ -995,8 +1014,8 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
                         ACTION_TYPE_ID[5],
                         ACTION_TYPE[5],
                         game.i18n.localize('abfalter.defMagicProj'),
-                        def,
-                        '').wrap(this.delimiter))
+                        '',
+                        def).wrap(this.delimiter))
             ]
 
             this.addActions(proj, GROUPS.magicProj)
@@ -1164,8 +1183,8 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
                                 ACTION_TYPE_ID[6],
                                 game.i18n.localize('tokenActionHUD.abfalter.mpath.' + s.system.path.toLowerCase()),
                                 s.name,
-                                '',
-                                s._id).wrap(this.delimiter)
+                                s._id,
+                                '').wrap(this.delimiter)
                             ))
                 })
                 if(spells.length < 1) return
@@ -1330,8 +1349,8 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
                         ACTION_TYPE_ID[11],
                         ACTION_TYPE[2],
                         'psychicPotential',
-                        this.actor.system.ppotential.final,
-                        ''
+                        '',
+                        this.actor.system.ppotential.final
                     ).wrap(this.delimiter))
             ], GROUPS.psyPotential)
 
@@ -1344,8 +1363,8 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
                         ACTION_TYPE_ID[12],
                         ACTION_TYPE[4],
                         'psyProj',
-                        this.actor.system.pproj.final,
-                        ''
+                        '',
+                        this.actor.system.pproj.final
                     ).wrap(this.delimiter))
             ], GROUPS.psyProj)
 
@@ -1364,8 +1383,8 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
                         ACTION_TYPE_ID[6],
                         '',
                         m.name,
-                        '',
-                        m._id).wrap(this.delimiter)
+                        m._id,
+                        '').wrap(this.delimiter)
                 ))
             })
 
@@ -1403,16 +1422,15 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
             let tokens = canvas.tokens.controlled.filter(t => t.actor?.type === 'character')
 
             tokens.forEach(async (t, i) => {
-                await this.#handleAction(event, t.actor, t, EncodedValue.fromRollIndex(encodedValue, '|', i).wrap('|'))
+                await this.#handleAction(event, t.actor, t, EncodedValue.fromRollIndex(encodedValue, '|', i))
             })
         }
 
         async #handleAction(event, actor, token, encodedValue){
-            let value = EncodedValue.unwrap(encodedValue, '|')
             let eventValue
             //TODO
             // updates case values with CharacterSheet._onWeaponRoll switch values when they are implemented
-            switch(value.actionType){
+            switch(encodedValue.actionType){
                 case 'weaponCombatRoll':
                     eventValue = 'weaponAtk'
                     break;
@@ -1428,16 +1446,16 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
                 defaultPrevented: true,
                 currentTarget : {
                     dataset: {
-                        label: value.name,
-                        roll: value.roll,
-                        type: value.actionType,
+                        label: encodedValue.name,
+                        roll: encodedValue.roll,
+                        type: encodedValue.actionType,
                         value: eventValue,
-                        id: value.id
+                        id: encodedValue.id
                     }
                 }
             }
             
-            switch(value.actionTypeId){
+            switch(encodedValue.actionTypeId){
 
                 case ACTION_TYPE_ID[0]: //ability
                 case ACTION_TYPE_ID[3]: //res
