@@ -1477,7 +1477,7 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
                     break;
 
                 case ACTION_TYPE_ID[2]: //equip
-                    let item = actor.items.get(value.id)
+                    let item = actor.items.get(encodedValue.id)
                     item.system.equipped = !item.system.equipped;
                     item.update({ "system.equipped": item.system.equipped });
                     break;
@@ -1492,7 +1492,7 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
                     break;
 
                 case ACTION_TYPE_ID[6]: //item
-                    actor.items.get(value.id).roll(value.name)
+                    actor.items.get(encodedValue.id).roll(encodedValue.name)
                     break;
 
                 default:
