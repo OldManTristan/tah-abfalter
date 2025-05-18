@@ -902,8 +902,13 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
                 let actions = []
                 //ki abs
                 kiAbs.forEach(a => {
+                    //Need to do that since they are not in the kiTab part of the lang file
+                    let string = 'abfalter'
+                    if(a[0].includes('kiDetection') || a[0].includes('kiConceal'))
+                        string += '.kiTab'
+                     
                     actions.push(new ActionData(
-                        game.i18n.localize(`abfalter.kiTab.${a[0]}`), a[0],
+                        game.i18n.localize(`${string}.${a[0]}`), a[0],
                         new EncodedValue(
                             '',
                             '',
