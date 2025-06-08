@@ -906,6 +906,8 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
                     let string = 'abfalter'
                     if(a[0].includes('kiDetection') || a[0].includes('kiConceal'))
                         string += '.kiTab'
+
+                    console.log(`Building Ki actions | name : ${string}.${a[0]} | localized : ${game.i18n.localize(`${string}.${a[0]}`)}`)
                      
                     actions.push(new ActionData(
                         game.i18n.localize(`${string}.${a[0]}`), a[0],
