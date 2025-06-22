@@ -115,17 +115,34 @@ export class ActionData {
     name
     id
     encodedValue
+    tooltip
 
     /**
      * 
      * @param {string} name 
      * @param {string} id 
      * @param {EncodedValue} encodedValue 
+     * @param {string} tooltip
+     */
+    constructor(name, id, encodedValue, tooltip){
+        this.name = name
+        this.id = id
+        this.encodedValue = encodedValue
+        this.tooltip = tooltip
+    }
+
+    /**
+     * 
+     * @param {string} name 
+     * @param {string} id 
+     * @param {EncodedValue} encodedValue 
+     * @param {string} tooltip
      */
     constructor(name, id, encodedValue){
         this.name = name
         this.id = id
         this.encodedValue = encodedValue
+        this.tooltip = null
     }
 }
 
@@ -240,6 +257,90 @@ export const Settings = {
     showAccuKi: 'showAccuKi',
     showKiAbility: 'showKiAbility',
     showAccuMagic: 'showAccuMagic'
+}
+
+export const TooltipDictionary = {
+    //ki
+    useOfKi: "abfalter.kiTab.descUseOfKi",
+    kiControl: "abfalter.kiTab.desckiControl",
+    kiDetection: "abfalter.kiTab.desckiDetection",
+    kiErudition: "abfalter.kiTab.desckiErudition",
+    kiCombatAura: "abfalter.kiTab.desckiCombatAura",
+    kiPhysDom: "abfalter.kiTab.desckiPhysDom",
+    kiPhysChange: "abfalter.kiTab.desckiPhysChange",
+    kiSuperiorChange: "abfalter.kiTab.desckiSuperiorChange",
+    kiMultBodies: "abfalter.kiTab.desckiMultBodies",
+    kiGreaterMult: "abfalter.kiTab.desckiGreaterMult",
+    kiArcaneMult: "abfalter.kiTab.desckiArcaneMult",
+    kiMagnitude: "abfalter.kiTab.desckiMagnitude",
+    kiArcaneMagn: "abfalter.kiTab.desckiArcaneMagn",
+    kiAgeControl: "abfalter.kiTab.desckiAgeControl",
+    kiTechImi: "abfalter.kiTab.desckiTechImi",
+    kiTechPush: "abfalter.kiTab.desckiTechPush",
+    weightElimination: "abfalter.kiTab.descweightElimination",
+    kiLevitation: "abfalter.kiTab.desckiLevitation",
+    kiObjectMotion: "abfalter.kiTab.desckiObjectMotion",
+    kiMassMove: "abfalter.kiTab.desckiMassMove",
+    kiFlight: "abfalter.kiTab.desckiFlight",
+    kiPresenceEx: "abfalter.kiTab.desckiPresenceEx",
+    kiEnergyArmor: "abfalter.kiTab.desckiEnergyArmor",
+    kiGreaterArmor: "abfalter.kiTab.desckiGreaterArmor",
+    kiArcaneArmor: "abfalter.kiTab.desckiArcaneArmor",
+    kiAuraEx: "abfalter.kiTab.desckiAuraEx",
+    kiEleFire: "abfalter.kiTab.desckiEleFire",
+    kiEleWater: "abfalter.kiTab.desckiEleWater",
+    kiEleAir: "abfalter.kiTab.desckiEleAir",
+    kiEleEarth: "abfalter.kiTab.desckiEleEarth",
+    kiEleLight: "abfalter.kiTab.desckiEleLight",
+    kiEleDark: "abfalter.kiTab.desckiEleDark",
+    kiIncreaseDmg: "abfalter.kiTab.desckiIncreaseDmg",
+    kiIncreaseReach: "abfalter.kiTab.desckiIncreaseReach",
+    kiIncreaseSpd: "abfalter.kiTab.desckiIncreaseSpd",
+    kiDestruction: "abfalter.kiTab.desckiDestruction",
+    kiAbsorbtion: "abfalter.kiTab.desckiAbsorbtion",
+    kiPhysShield: "abfalter.kiTab.desckiPhysShield",
+    kiTrans: "abfalter.kiTab.desckiTrans",
+    kiHeal: "abfalter.kiTab.desckiHeal",
+    kiSupHeal: "abfalter.kiTab.desckiSupHeal",
+    kiStabil: "abfalter.kiTab.desckiStabil",
+    kiLifeSac: "abfalter.kiTab.desckiLifeSac",
+    kiUseOfEne: "abfalter.kiTab.desckiUseOfEne",
+    kiConceal: "abfalter.kiTab.desckiConceal",
+    kiAuraConceal: "abfalter.kiTab.desckiAuraConceal",
+    kiFalseDeath: "abfalter.kiTab.desckiFalseDeath",
+    kiEleminationOfNec: "abfalter.kiTab.desckiEleminationOfNec",
+    kiEleImmHeat: "abfalter.kiTab.desckiEleImmHeat",
+    kiEleImmCold: "abfalter.kiTab.desckiEleImmCold",
+    kiEleImmEle: "abfalter.kiTab.desckiEleImmEle",
+    kiPenRed: "abfalter.kiTab.desckiPenRed",
+    kiRecovery: "abfalter.kiTab.desckiRecovery",
+    kiRestoreOther: "abfalter.kiTab.desckiRestoreOther",
+    kiCharacAug: "abfalter.kiTab.desckiCharacAug",
+    kiSupCharacAug: "abfalter.kiTab.desckiSupCharacAug",
+    kiImpovTech: "abfalter.kiTab.desckiImpovTech",
+    kiInhumanity: "abfalter.kiTab.desckiInhumanity",
+    kiZen: "abfalter.kiTab.desckiZen",
+    useOfNemesis: "abfalter.kiTab.descuseOfNemesis",
+    nemiArmor: "abfalter.kiTab.descnemiArmor",
+    nemiNoht: "abfalter.kiTab.descnemiNoht",
+    nemiKiCancel: "abfalter.kiTab.descnemiKiCancel",
+    nemiGreaterKiCancel: "abfalter.kiTab.descnemiGreaterKiCancel",
+    nemiMysticCancel: "abfalter.kiTab.descnemiMysticCancel",
+    nemiGreaterMysticCancel: "abfalter.kiTab.descnemiGreaterMysticCancel",
+    nemiMatrixCancel: "abfalter.kiTab.descnemiMatrixCancel",
+    nemiGreaterMatrixCancel: "abfalter.kiTab.descnemiGreaterMatrixCancel",
+    nemiBindCancel: "abfalter.kiTab.descnemiBindCancel",
+    nemiEmptyExt: "abfalter.kiTab.descnemiEmptyExt",
+    nemiFormOfEmpty: "abfalter.kiTab.descnemiFormOfEmpty",
+    nemiBodyEmpty: "abfalter.kiTab.descnemiBodyEmpty",
+    nemiNoNeeds: "abfalter.kiTab.descnemiNoNeeds",
+    nemiMoveEmpty: "abfalter.kiTab.descnemiMoveEmpty",
+    nemiEssenceEmpty: "abfalter.kiTab.descnemiEssenceEmpty",
+    nemiOneNothing: "abfalter.kiTab.descnemiOneNothing",
+    nemiAuraEmpty: "abfalter.kiTab.descnemiAuraEmpty",
+    nemiUndetectable: "abfalter.kiTab.descnemiUndetectable",
+    nemiInhumanity: "abfalter.kiTab.descnemiInhumanity",
+    nemiZen: "abfalter.kiTab.descnemiZen",
 }
 
 Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
@@ -915,7 +1016,8 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
                             a[0],
                             '',
                             ''
-                        ).wrap(this.delimiter)
+                        ).wrap(this.delimiter),
+                        this.getTooltip(a[0])
                     ))
                 })
                 this.addActions(actions, GROUPS.kiAbilities)
@@ -1008,7 +1110,7 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
                     'mprojoff',
                     new EncodedValue (
                         ACTION_TYPE_ID[5],
-                        ACTION_TYPE[5],
+                        ACTION_TYPE[4],
                         game.i18n.localize('abfalter.offMagicProj'),
                         '',
                         system.toggles.magicAtkModule ? system.mproj.atkModule : system.mproj.finalOffensive).wrap(this.delimiter)),
@@ -1017,7 +1119,7 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
                     'mprojdef',
                     new EncodedValue (
                         ACTION_TYPE_ID[5],
-                        ACTION_TYPE[5],
+                        ACTION_TYPE[4],
                         game.i18n.localize('abfalter.defMagicProj'),
                         '',
                         def).wrap(this.delimiter))
@@ -1409,6 +1511,20 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
 
         #BuildEffect(){
             if(this.multiple) return;
+        }
+
+        /**
+         * @param {string} id the end part of the localization string, to compare to the dictionary
+         * @returns {string|null} the description
+         */
+        getTooltip(id){
+            if(!id)
+                return null
+
+            let map = new Map(Object.entries(ToolTipDictionary))
+            let value = map.get(id)
+
+            return value ?? null
         }
     }
 
