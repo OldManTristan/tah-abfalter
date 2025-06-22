@@ -124,25 +124,11 @@ export class ActionData {
      * @param {EncodedValue} encodedValue 
      * @param {string} tooltip
      */
-    constructor(name, id, encodedValue, tooltip){
+    constructor(name, id, encodedValue, tooltip = ""){
         this.name = name
         this.id = id
         this.encodedValue = encodedValue
         this.tooltip = tooltip
-    }
-
-    /**
-     * 
-     * @param {string} name 
-     * @param {string} id 
-     * @param {EncodedValue} encodedValue 
-     * @param {string} tooltip
-     */
-    constructor(name, id, encodedValue){
-        this.name = name
-        this.id = id
-        this.encodedValue = encodedValue
-        this.tooltip = null
     }
 }
 
@@ -1521,7 +1507,7 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
             if(!id)
                 return null
 
-            let map = new Map(Object.entries(ToolTipDictionary))
+            let map = new Map(Object.entries(TooltipDictionary))
             let value = map.get(id)
 
             return value ?? null
