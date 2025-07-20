@@ -27,7 +27,9 @@ export const ACTION_TYPE_ID = [
     'maccu',
     'maccuhalf',
     'potential',
-    'psyProj'
+    'psyProj',
+    'def',
+    'dod'
 ]
 export class EncodedValue {
 
@@ -522,7 +524,7 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
                 game.i18n.localize('abfalter.block'),
                 `block${label}`,
                 new EncodedValue(
-                    ACTION_TYPE_ID[5],
+                    ACTION_TYPE_ID[(w ? 13 : 5)],
                     ACTION_TYPE[(!!w ? 6 : 4)],
                     (w ? w.name : 'block'),
                     id,
@@ -534,7 +536,7 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
                 game.i18n.localize('abfalter.dodge'),
                 `dodge${label}`,
                 new EncodedValue(
-                    ACTION_TYPE_ID[5],
+                    ACTION_TYPE_ID[(w ? 14 : 5)],
                     ACTION_TYPE[(!!w ? 6 : 4)],
                     (w ? w.name : 'dodge'),
                     id,
@@ -1539,7 +1541,17 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
             // updates case values with CharacterSheet._onWeaponRoll switch values when they are implemented
             switch(encodedValue.actionType){
                 case 'weaponCombatRoll':
-                    eventValue = 'weaponAtk'
+                    switch(encodedValue.actionTypeId){
+                        case 'atk':
+                            eventValue = 'weaponAtk'
+                            break;
+                        case 'def':
+                            eventValue = 'weaponDef'
+                            break;
+                        case 'dod':
+                            eventValue = 'weaponDod'
+                            break;
+                    }
                     break;
 
                 case 'breakageRoll':
@@ -1590,6 +1602,8 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
                     break;
 
                 case ACTION_TYPE_ID[4]: //atk
+                case ACTION_TYPE_ID[13]: //def
+                case ACTION_TYPE_ID[14]: //dod
                     actor.sheet._onWeaponRoll(juryriggedEvent)
                     break;
 
