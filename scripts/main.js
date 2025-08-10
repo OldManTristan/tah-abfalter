@@ -407,9 +407,6 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
                     settings: {/*showTitle: false*/}
                 }
 
-                //TODO
-                //setting show image
-
                 if(game.settings.get(MODULEID, Settings.weaponImage))
                     groupCombat.settings.image = w.img
 
@@ -525,7 +522,7 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
                 `block${label}`,
                 new EncodedValue(
                     ACTION_TYPE_ID[(w ? 13 : 5)],
-                    ACTION_TYPE[(!!w ? 6 : 4)],
+                    ACTION_TYPE[(w ? 5 : 4)],
                     (w ? w.name : 'block'),
                     id,
                     (w ? '' : blockValues)
@@ -537,7 +534,7 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
                 `dodge${label}`,
                 new EncodedValue(
                     ACTION_TYPE_ID[(w ? 14 : 5)],
-                    ACTION_TYPE[(!!w ? 6 : 4)],
+                    ACTION_TYPE[(w ? 5 : 4)],
                     (w ? w.name : 'dodge'),
                     id,
                     (w ? '' : dodgeValues)
@@ -1099,7 +1096,7 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
                     new EncodedValue (
                         ACTION_TYPE_ID[5],
                         ACTION_TYPE[4],
-                        game.i18n.localize('abfalter.offMagicProj'),
+                        'offMagicProj',
                         '',
                         system.toggles.magicAtkModule ? system.mproj.atkModule : system.mproj.finalOffensive).wrap(this.delimiter)),
                 new ActionData(
@@ -1108,7 +1105,7 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
                     new EncodedValue (
                         ACTION_TYPE_ID[5],
                         ACTION_TYPE[4],
-                        game.i18n.localize('abfalter.defMagicProj'),
+                        'defMagicProj',
                         '',
                         def).wrap(this.delimiter))
             ]
